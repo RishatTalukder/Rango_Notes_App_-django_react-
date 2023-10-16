@@ -48,13 +48,13 @@ $ python manage.py runserver
 - [6. Create a Django Admin](#6-create-a-django-admin)
 - [7. Create a Django Serializer](#7-create-a-django-serializer)
 - [8. Create a Django API View](#8-create-a-django-api-view)
-- [9. Create a React App](#10-create-a-react-app)
-- [10. Create a React Component](#11-create-a-react-component)
-- [11. Create a React Route](#12-create-a-react-route)
-- [12. Create a React Service](#13-create-a-react-service)
-- [13. connect React with Django](#14-connect-react-with-django)
-- [14. Testing the App](#15-testing-the-app)
-- [15. Deploying the App](#16-deploying-the-app)
+- [9. Create a React App](#9-create-a-react-app)
+- [10. Create a React Component](#10-create-a-react-component)
+- [11. Making a Api Call](#11-making-a-api-call)
+- [12. Create a React Service](#12-create-a-react-service)
+- [13. connect React with Django](#13-connect-react-with-django)
+- [14. Testing the App](#14-testing-the-app)
+- [15. Deploying the App](#15-deploying-the-app)
 
 ## 1. Create a Django Project
 
@@ -511,4 +511,154 @@ this will serve  your project at `http://localhost:3000/` and you will see the d
 
 ## 10. Create a React Component
 
-we will open the 
+we will open the `frontend` and we dont really need some files and folders so we can remove them. so remove the following files and folders:
+
+- `src/App.test.js`
+- `src/index.css`
+- `src/logo.svg`
+- `src/serviceWorker.js`
+- `src/setupTests.js`
+- `src/reportWebVitals.js`
+
+Deleting these files will cause some errors so lets fix those errors too. Its pretty simple to remove those error, we just need to go to the `src/index.js` file and keep the following code:
+
+```javascript
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+```
+
+And we can remove the rest.
+also in the `src/App.js` file we can the following code:
+
+```javascript
+import "./App.css";
+
+function App() {
+  return (
+    <div className="App">
+      My App 
+    </div>
+  );
+}
+
+export default App;
+```
+
+everything else can be removed. now we can create our first component. so lets create a folder named `components` in the `src` folder. and create a file named `Header.js` and `Footer.js` in the `components` folder. and add the following code in it:
+
+```javascript
+import React from 'react'
+
+function Header() {
+  return (
+    <div>Header</div>
+  )
+}
+
+export default Header
+```
+for the `Footer.js` file:
+
+```javascript
+import React from 'react'
+
+function Footer() {
+  return (
+    <div>Footer</div>
+  )
+}
+
+export default Footer
+```
+
+> Note: remember to capitalize the first letter of the component name. otherwise it will not work.
+
+now we can import these components in the `App.js` file and use them. so lets import them in the `App.js` file:
+
+```javascript
+import "./App.css";
+import Header from './components/Header'
+import Footer from './components/Footer'
+
+function App() {
+  return (
+    <div className="App">
+      <Header /> {/* new */}
+      My app
+      <Footer /> {/* new */}
+    </div>
+  );
+}
+
+export default App;
+```
+
+now we can see the `Header` and `Footer` component in the browser. now we can move on to the next step.
+
+## 11. Making a Api call
+
+We have a header and footer component. now we need to create a component for the home page. so lets create a file named `NotesListPage.js` in a new folder, I named the folder `Pages` folder and add the following code in it:
+
+```javascript
+import React from 'react'
+
+function NotesListPage() {
+  return (
+    <div>Notes List Page</div>
+  )
+}
+
+export default NotesListPage
+```
+
+now we can import this component in the `App.js` file and use it. so lets import it in the `App.js` file:
+
+```javascript
+import "./App.css";
+import Header from './components/Header'
+import Footer from './components/Footer'
+import NotesListPage from './pages/NotesListPage'
+
+function App() {
+  return (
+    <div className="App">
+      <Header />
+      <NotesListPage /> {/* new */}
+      {/*My app*/}
+      <Footer />
+    </div>
+  );
+}
+
+export default App;
+```
+
+now we can see the `NotesListPage` component in the browser.
+
+Now, we need to make an API call to get the data from our backend. So, let’s make an API call using the following code in the `NotesListPage.js` file:
+
+```javascript
+import React, { useState, useEffect } from 'react' // new
+
+function NotesListPage() {
+  const [notes, setNotes] = useState([]) // new
+
+  useEffect(() => { // new
+    fetch('http://localhost:8000/notes/') // new
+      .then(res => res.json()) // new
+      .then(data => setNotes(data)) // new
+  }, []) // new
+
+  return (
+    <div>Notes List Page</div>
+  )
+}
+
