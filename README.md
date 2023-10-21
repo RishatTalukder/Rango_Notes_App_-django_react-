@@ -35,7 +35,6 @@ $ python manage.py runserver
 
 ### 4. Open localhost:8000 in the browser.
 
-
 ## so lets get started
 
 # table of Content:
@@ -51,7 +50,7 @@ $ python manage.py runserver
 - [9. Create a React App](#9-create-a-react-app)
 - [10. Create a React Component](#10-create-a-react-component)
 - [11. Making a Api Call](#11-making-a-api-call)
-- [12. Create a React Service](#12-create-a-react-service)
+- [12. Create a React Router](#12-create-a-react-router)
 - [13. connect React with Django](#13-connect-react-with-django)
 - [14. Testing the App](#14-testing-the-app)
 - [15. Deploying the App](#15-deploying-the-app)
@@ -108,13 +107,14 @@ Now, let’s run the Django development server using the following command:
 ```bash
 $ cd backend
 ```
+
 > Note: Make sure you are in the same directory where the `manage.py` file is located.
 
 ```bash
 $ python manage.py runserver
 ```
 
-this will serve  your project at `http://127.0.0.1:8000/`
+this will serve your project at `http://127.0.0.1:8000/`
 
 > i'll use `localhost:8000` instead of the above url. so if you see `localhost:8000` in the code, you should know that i'm talking about `http://127.0.0.1:8000/`
 
@@ -158,12 +158,12 @@ INSTALLED_APPS = [
 
 SO, we are actually creating a notes app. The app will give us the ability to create, read, update and delete notes. But, Here we are using the React framework to create the frontend of our app. So, we only need the `JSON` data from our backend. So, we will create a view which will return the `JSON` data. So, let’s create a view using the following code in the `notes_api/views.py` file:
 
-```python   
+```python
 from django.shortcuts import render
 from django.http import JsonResponse # new
 
 # function to handle the request of the route
-def routes(request):    
+def routes(request):
     routes = {
         'notes': '/notes',
         'notes detail': '/notes/<str:pk>',
@@ -209,8 +209,8 @@ and open `http://localhost:8000/` in the browser. you will see the following `JS
 
 ```json
 {
-    "notes": "/notes",
-    "notes detail": "/notes/<str:pk>"
+  "notes": "/notes",
+  "notes detail": "/notes/<str:pk>"
 }
 ```
 
@@ -263,7 +263,38 @@ def routes(request):
 Nothing much has changed, we just added some more routes to the `routes` function. now if you go to `http://localhost:8000/` you will see the following `JSON` response:
 
 ```json
-[{"Endpoint": "/notes/", "method": "GET", "body": null, "description": "Returns an array of notes"}, {"Endpoint": "/notes/id", "method": "GET", "body": null, "description": "Returns a single note object"}, {"Endpoint": "/notes/create/", "method": "POST", "body": {"body": ""}, "description": "Creates new note with data sent in post request"}, {"Endpoint": "/notes/id/update/", "method": "PUT", "body": {"body": ""}, "description": "Creates an existing note with data sent in post request"}, {"Endpoint": "/notes/id/delete/", "method": "DELETE", "body": null, "description": "Deletes and exiting note"}]
+[
+  {
+    "Endpoint": "/notes/",
+    "method": "GET",
+    "body": null,
+    "description": "Returns an array of notes"
+  },
+  {
+    "Endpoint": "/notes/id",
+    "method": "GET",
+    "body": null,
+    "description": "Returns a single note object"
+  },
+  {
+    "Endpoint": "/notes/create/",
+    "method": "POST",
+    "body": { "body": "" },
+    "description": "Creates new note with data sent in post request"
+  },
+  {
+    "Endpoint": "/notes/id/update/",
+    "method": "PUT",
+    "body": { "body": "" },
+    "description": "Creates an existing note with data sent in post request"
+  },
+  {
+    "Endpoint": "/notes/id/delete/",
+    "method": "DELETE",
+    "body": null,
+    "description": "Deletes and exiting note"
+  }
+]
 ```
 
 a one line `JSON` response. now we need to install the `rest framework` to make it look better. but before that lets make a `model` for our notes.
@@ -359,10 +390,10 @@ def routes(request):
     ]
     return Response(routes) # new
 ```
+
 > Note: we are using the `Response` class to send the `JSON` response and the `api_view` decorator to specify the type of request. This will also help us to add more request types in the future and format the data accordingly.
 
 Now, run the development server and you should see the default `rest framework` page. And the json data well formatted. There are some options that you can explore. SO feel free to explore. now we can move on to the next step.
-
 
 now, you should make some dummy data by going to the admin page and adding some notes. So that we can see the data in the frontend but as we are making a api we need to get the data from the database in `json` format. SO go to the admin page `localhost:8000/admin` and add some notes.
 
@@ -468,10 +499,10 @@ urlpatterns = [
     path('notes/<str:pk>', views.getNote, name='note'), # new
 ]
 ```
-> Note: we are using the `str` data type for the `pk` argument. You can also use `int` if you are using an integer id.  this will be used to get a single note from the database and the `pk` will be used to specify the id of the note.
+
+> Note: we are using the `str` data type for the `pk` argument. You can also use `int` if you are using an integer id. this will be used to get a single note from the database and the `pk` will be used to specify the id of the note.
 
 Now, run the development server and go to `http://localhost:8000/notes/1` in the browser. You will see that the data from our model is serialized and returned in `JSON` format. This the data that we will use in our frontend.
-
 
 ## 9. Create a React App
 
@@ -507,7 +538,7 @@ $ cd frontend
 $ npm start
 ```
 
-this will serve  your project at `http://localhost:3000/` and you will see the default react page. now we can move on to the next step.
+this will serve your project at `http://localhost:3000/` and you will see the default react page. now we can move on to the next step.
 
 ## 10. Create a React Component
 
@@ -523,11 +554,11 @@ we will open the `frontend` and we dont really need some files and folders so we
 Deleting these files will cause some errors so lets fix those errors too. Its pretty simple to remove those error, we just need to go to the `src/index.js` file and keep the following code:
 
 ```javascript
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <App />
@@ -542,11 +573,7 @@ also in the `src/App.js` file we can the following code:
 import "./App.css";
 
 function App() {
-  return (
-    <div className="App">
-      My App 
-    </div>
-  );
+  return <div className="App">My App</div>;
 }
 
 export default App;
@@ -555,28 +582,25 @@ export default App;
 everything else can be removed. now we can create our first component. so lets create a folder named `components` in the `src` folder. and create a file named `Header.js` and `Footer.js` in the `components` folder. and add the following code in it:
 
 ```javascript
-import React from 'react'
+import React from "react";
 
 function Header() {
-  return (
-    <div>Header</div>
-  )
+  return <div>Header</div>;
 }
 
-export default Header
+export default Header;
 ```
+
 for the `Footer.js` file:
 
 ```javascript
-import React from 'react'
+import React from "react";
 
 function Footer() {
-  return (
-    <div>Footer</div>
-  )
+  return <div>Footer</div>;
 }
 
-export default Footer
+export default Footer;
 ```
 
 > Note: remember to capitalize the first letter of the component name. otherwise it will not work.
@@ -585,8 +609,8 @@ now we can import these components in the `App.js` file and use them. so lets im
 
 ```javascript
 import "./App.css";
-import Header from './components/Header'
-import Footer from './components/Footer'
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 
 function App() {
   return (
@@ -608,24 +632,22 @@ now we can see the `Header` and `Footer` component in the browser. now we can mo
 We have a header and footer component. now we need to create a component for the home page. so lets create a file named `NotesListPage.js` in a new folder, I named the folder `Pages` folder and add the following code in it:
 
 ```javascript
-import React from 'react'
+import React from "react";
 
 function NotesListPage() {
-  return (
-    <div>Notes List Page</div>
-  )
+  return <div>Notes List Page</div>;
 }
 
-export default NotesListPage
+export default NotesListPage;
 ```
 
 now we can import this component in the `App.js` file and use it. so lets import it in the `App.js` file:
 
 ```javascript
 import "./App.css";
-import Header from './components/Header'
-import Footer from './components/Footer'
-import NotesListPage from './pages/NotesListPage'
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import NotesListPage from "./pages/NotesListPage";
 
 function App() {
   return (
@@ -646,19 +668,248 @@ now we can see the `NotesListPage` component in the browser.
 Now, we need to make an API call to get the data from our backend. So, let’s make an API call using the following code in the `NotesListPage.js` file:
 
 ```javascript
-import React, { useState, useEffect } from 'react' // new
+import React, { useState, useEffect } from "react"; // new
 
 function NotesListPage() {
-  const [notes, setNotes] = useState([]) // new
+  let [notes, setNotes] = useState([]); // new
 
-  useEffect(() => { // new
-    fetch('http://localhost:8000/notes/') // new
-      .then(res => res.json()) // new
-      .then(data => setNotes(data)) // new
-  }, []) // new
+  let getNotes = async () => {
+    // new
+    let response = await fetch("http://localhost:8000/api/notes/"); // new
+    let data = await response.json(); // new
+    setNotes(data); // new
+  }; // new
 
   return (
-    <div>Notes List Page</div>
-  )
+    <div>
+      <div>
+        {/* mapping the notes array we got from django rest framework*/}
+        {notes.map((note) => (
+          <div key={note.id}>{note.body}</div>
+        ))}
+      </div>{" "}
+      {/* new */}
+    </div>
+  );
 }
+```
+
+> Note: we are using the `useState` hook to create a state variable named `notes` and the `useEffect` hook to make the API call when the component is rendered. We are also using the `fetch` function to make the API call and the `json` function to convert the response into JSON. We are also using the `map` function to loop through the `notes` array and display the notes.
+
+So what we are doing here is we are making an api call to the `http://localhost:8000/api/notes/` url and getting the data from the backend. and we are storing the data in the `notes` state variable. and we are looping through the `notes` array and displaying the notes.
+
+Now this will give us an error because we are trying to get data from the `http://localhost:8000/api/notes/` url but we dont have that url in our backend. So lets fix that by going to the `backend/urls.py` file and adding the following code:
+
+```python
+
+from django.contrib import admin
+from django.urls import path,include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/',include('notes_api.urls')) # new
+]
+
+```
+
+> Note: we are using the `include` function to include the `notes_api/urls.py` file in the `backend/urls.py` file. We are also using the `api` prefix for the `notes_api/urls.py` file. So, we need to add the `api` prefix in the `notes_api/urls.py` file.
+
+I created the view for that so to double check go to `http://localhost:8000/api/notes/` and you will see the data in `json` format.
+
+Now if you did everything right you should see the notes in you react server but there will be another error. the error will be something like this:
+
+```bash
+cors error
+```
+
+this is because we are trying to get data from a different server. so we need to install a package named `django-cors-headers` using the following command:
+
+```bash
+$ pip install django-cors-headers
+```
+
+now we need to add the `corsheaders` in the `INSTALLED_APPS` list in the `backend/settings.py` file. So, open the `backend/settings.py` file and add the following code in the `INSTALLED_APPS` list:
+
+```python
+INSTALLED_APPS = [
+    ...
+    'rest_framework',
+    'notes_api',
+    'corsheaders', # new
+]
+```
+
+now we need to add the `corsheaders` middleware in the `MIDDLEWARE` list in the `backend/settings.py` file. So, open the `backend/settings.py` file and add the following code in the `MIDDLEWARE` list:
+
+```python
+MIDDLEWARE = [
+    ...
+    'corsheaders.middleware.CorsMiddleware', # new
+    'django.middleware.common.CommonMiddleware', # new
+]
+```
+
+now we need to add the `CORS_ORIGIN_ALLOW_ALL` in the `backend/settings.py` file. So, open the `backend/settings.py` file and add the following code:
+
+```python
+CORS_ORIGIN_ALLOW_ALL = True # new
+```
+
+> Note: we are using the `CORS_ORIGIN_ALLOW_ALL` to allow all the origins to make the API call. You can also specify the origins that you want to allow by using the `CORS_ORIGIN_WHITELIST` list. You can know more about the `django-cors-headers` package from the [official documentation](https://pypi.org/project/django-cors-headers/).
+
+now you should restart the django server and you see the notes in the react server.
+
+If you did everything right you should see the notes in your react server.
+
+We can make it cleaner by making another component for the notes. so lets create a file named `ListItem.js` in the `components` folder and add the following code in `components/ListItem.js` file:
+
+```javascript
+import React from "react";
+
+function ListItem({ note }) {
+  return <div>{note.body}</div>;
+}
+
+export default ListItem;
+```
+
+> this component will take a prop named `note` and display the `note.body` in the browser.
+
+now we can import this component in the `NotesListPage.js` file and use it. so lets import it in the `NotesListPage.js` file:
+
+```javascript 
+import React from "react";
+import { useState, useEffect } from "react";
+import ListItem from "../component/ListItem"; {/* new */}
+
+const NotesListPage = () => {
+  let [notes, setNotes] = useState([]);
+  useEffect(() => {
+    getNotes();
+  }, []);
+
+  let getNotes = async () => {
+    let response = await fetch("http://127.0.0.1:8000/api/notes/");
+    let data = await response.json();
+    setNotes(data);
+  };
+
+  return (
+    <div>
+      <div className="notes_list">
+        {notes.map((note, index) => (
+          <ListItem key={index} note={note} /> {/* new */}
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default NotesListPage;
+```
+
+> Note: we are using the `ListItem` component to display the notes. We are also using the `note` prop to pass the note to the `ListItem` component. We are also using the `key` prop to specify the key for the `ListItem` component. We are also using the `index` argument to specify the index of the note.(else we will get an error)
+
+now we can see the notes in the browser. And its a little less complicated.
+
+You might still face some errors but once you add the proxy in the `package.json` file it will work fine. so lets add the proxy in the `package.json` file:
+
+```json
+{
+  {
+  "name": "frontend",
+  "proxy": "http://127.0.0.1:8000", // new
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4"
+  },
+  ....
+```
+
+> Note: we are using the `proxy` to specify the backend url. You can also use the full url in the `fetch` function. But using the `proxy` is a better option.
+
+now we can use this link without specifying the full url. so lets change the `fetch` function in the `NotesListPage.js` file:
+
+```javascript
+import React from "react";
+import { useState, useEffect } from "react";
+import ListItem from "../component/ListItem";
+
+const NotesListPage = () => {
+  let [notes, setNotes] = useState([]);
+  useEffect(() => {
+    getNotes();
+  }, []);
+
+  let getNotes = async () => {
+    let response = await fetch("/api/notes/"); {/*no need to specify the full url*/} 
+    let data = await response.json();
+    setNotes(data);
+  };
+
+  return (
+    <div>
+      <div className="notes_list">
+        {notes.map((note, index) => (
+          <ListItem key={index} note={note} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default NotesListPage;
+```
+
+now we can see the notes in the browser without any errors.
+
+## 12. Create a React Router
+
+Now that we fetched the data from the backend we need to create a router so that we can navigate to different pages.
+
+So, let’s install the `react-router-dom` package using the following command:
+
+```bash
+$ npm install react-router-dom
+```
+
+> this will install the `react-router-dom` package in our project. We will use this package to create the router. You can know more about the `react-router-dom` package from the [official documentation](https://reactrouter.com/en/6.17.0/start/tutorial).
+
+To route the page we need to wrap the `App` component with the `Router` component. So, let’s wrap the `App` component with the `Router` component using the following code in the `src/App.js` file:
+
+```javascript
+....
+{/*importing the BrowserRouter component from react-router-dom*/}
+
+import { Route, BrowserRouter as Router } from "react-router-dom"; {/* new */}
+import { Routes } from "react-router-dom"; {/* new */}
+
+function App() {
+  return (
+    <Router> {/* new */}
+      <div className="App">
+        <Header />
+        <Routes> {/* new */}
+          <Route path="/" element={<NotesListPage />} />
+        </Routes> {/* new */}
+        <Footer />
+      </div>
+    </Router> {/* new */}
+  );
+}
+
+....
+```
+> Note: we are using the `Route` component to specify the route for the `NotesListPage` component. We are also using the `path` prop to specify the path for the `NotesListPage` component. We are also using the `element` prop to specify the component for the `NotesListPage` component. We are also using the `Routes` component to specify the routes for the `App` component. We are also using the `Router` component to wrap the `App` component.
+
+
+> Note: the `Route` component will render the `NotesListPage` component when the path is `/`. You can also use the `exact` prop to specify the exact path for the `NotesListPage` component.
+
 
