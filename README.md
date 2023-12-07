@@ -785,6 +785,432 @@ INSTALLED_APPS = [
 ]
 ```
 
+Now that we created the django project and the app we need to create an api for the `frontend` to communicate with the `backend`. So, goto the `backend/notes/views.py` file and type:
+
+```python
+from django.shortcuts import render
+from django.http import JsonResponse
+
+def getRoutes(request):
+    routes = [
+        'api/notes',
+    ]
+    return JsonResponse(routes, safe=False)
+```
+
+> this will return a json response with the routes.
+
+This is a dummy `json` response to show you how we will approach the api part. This is the `function` that will render the `json` response. But we need to add this function to the `urls.py` file. So, make a new file named `urls.py` inside the `backend/notes` folder and type:
+
+```python
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    path('', views.getRoutes),
+]
+```
+> this should be the same typed here. I fyou din't type it correctly then you will get an error.
+
+Now we need to add connect this `notes/urls.py` file to the `backend/backend/urls.py` file. So, goto the `backend/backend/urls.py` file and type:
+
+```python
+from django.contrib import admin
+from django.urls import path, include # importing the include function
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/', include('notes.urls')), # adding the notes/urls.py file
+]
+```
+
+> this will connect the `notes/urls.py` file to the `backend/backend/urls.py` file.
+
+And the path will be `api/` for all the routes we set in the `notes/urls.py` file. So, if you goto the `localhost:8000/api/` you should see the `json` response.
+
+Now you know how we can easily create an api for the `frontend`. Lets use a data biggers than the dummy data we used in the `frontend`. So, goto the `backend/notes/views.py` file and type:
+
+```python
+from django.shortcuts import render
+from django.http import JsonResponse
+
+def getRoutes(request):
+    routes = [
+        {
+            'Endpoint': '/notes/',
+            'method': 'GET',
+            'body': None,
+            'description': 'Returns an array of notes'
+        },
+        {
+            'Endpoint': '/notes/id',
+            'method': 'GET',
+            'body': None,
+            'description': 'Returns a single note object'
+        },
+        {
+            'Endpoint': '/notes/create/',
+            'method': 'POST',
+            'body': {'body': ""},
+            'description': 'Creates new note with data sent in post request'
+        },
+        {
+            'Endpoint': '/notes/id/update/',
+            'method': 'PUT',
+            'body': {'body': ""},
+            'description': 'Creates an existing note with data sent in post request'
+        },
+        {
+            'Endpoint': '/notes/id/delete/',
+            'method': 'DELETE',
+            'body': None,
+            'description': 'Deletes and exiting note'
+        },
+    ]
+
+    return JsonResponse(routes, safe=False)
+
+```
+
+Now goto the `localhost:8000/api/` and you should see the `json` response. But it's messy and we cannot see the data clearly.
+
+## Using the Django Rest Framework
+
+lets use the `django-rest-framework` package to make the `json` response more readable. So, goto the terminal and type:
+
+```bash
+
+(venv) project/backend$ pip install djangorestframework
+```
+
+> this will install the `django-rest-framework` package in the virtual environment.
+
+Now we need to add the `rest_framework` to the `INSTALLED_APPS` list in the `backend/backend/settings.py` file. So, goto the `backend/backend/settings.py` file and add the `rest_framework` to the `INSTALLED_APPS` list like this:
+
+```python
+INSTALLED_APPS = [
+    'notes',
+    'rest_framework', # adding the rest_framework
+    'django.contrib.admin',
+    .....
+]
+```
+
+Now we can use the `rest_framework` to make the `json` response more readable. So, goto the `backend/notes/views.py` file and type:
+
+```python
+from django.shortcuts import render
+#from django.http import JsonResponse # we dont need this anymore
+
+from rest_framework.response import Response # importing the Response function
+
+def getRoutes(request):
+    routes = [
+        ..... # the same code from before
+    ]
+
+    return Response(routes) # using the Response function
+
+```
+
+But this will give you an error. So, goto the `backend/notes/views.py` file and type:
+
+```python
+from django.shortcuts import render
+from rest_framework.decorators import api_view # importing the api_view function
+from rest_framework.response import Response
+
+@api_view(['GET']) # using the api_view function
+def getRoutes(request):
+    routes = [
+        ..... # the same code from before
+    ]
+
+    return Response(routes)
+
+```
+
+Now goto the `localhost:8000/api/` and you should see the `json` response in a more readable way with default `rest_framework` styling. 
+
+> the decorator `@api_view(['GET'])` is used to specify the method of the request. We will use this decorator for all the routes. But this was to show you how we can use the `rest_framework` package to make the `json` response more readable.
+
+
+Now that we know how to make a good json response lets make the database for the project.
+
+# Creating the Database
+
+`Django` has a built in database called `sqlite3`. We will use this database for the project. So, goto the `backend/backend/settings.py` file and find the `DATABASES` dictionary and edit it like this:
+
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3', # this is the path to the database
+    }
+}
+```
+
+This is the default setup and we will use this for the meantime. But if you want make it more challenging you can use `postgresql` or `mysql` database. But for now we will use the default `sqlite3` database.
+
+If you don't know `sqlite3` is a `no-sql` database. So, we don't need to create a table for the database. We can just create a model and the database will create the table for us. 
+
+## Creating the Model
+Go to the `backend/notes/models.py` file and type:
+
+```python
+from django.db import models
+
+class Note(models.Model): # creating the model
+    body = models.TextField(null=True, blank=True) # creating the body field
+    created = models.DateTimeField(auto_now_add=True) # creating the created field
+    updated = models.DateTimeField(auto_now=True) # creating the updated field
+
+    def __str__(self):
+        return self.body[:50] # returning the title of the note
+```
+
+> the `__str__` method is used to return the title of the note. We will use this method to show the title of the note in the admin panel.
+
+In case you didn't know here is an overview of what i did here:
+
+- I created a model named `Note` and it has 3 fields `body`, `created` and `updated`.
+- The `body` field is a `TextField` field and it can be `null` or `blank`.
+- The `created` field is a `DateTimeField` field and it will be automatically added when a note is created.
+- The `updated` field is a `DateTimeField` field and it will be automatically updated when a note is updated.
+- The `__str__` method is used to return the title of the note. We will use this method to show the title of the note in the admin panel.
+
+This is the model we only need for the project. Now we have to migrate the model to the database. To do that type:
+
+```bash
+(venv) project/backend$ python manage.py makemigrations
+```
+
+> this will create a migration file for the model.
+
+Now we need to migrate the model to the database. To do that type:
+
+```bash
+(venv) project/backend$ python manage.py migrate
+```
+> now the table for the model is created in the database. You can check it in the `backend/db.sqlite3` file. Other builtin django tables are also there.
+
+Now we need to register the model in the admin panel. So, goto the `backend/notes/admin.py` file and type:
+
+```python
+from django.contrib import admin
+
+from .models import Note # importing the Note model
+
+admin.site.register(Note) # registering the Note model
+```
+
+Now if you goto the `localhost:8000/admin/` you should see the `Note` model in the admin panel. You can add, edit and delete notes from the admin panel but you need to be a `superuser` to be able to do that.
+
+You can make yourself the superuser by typing:
+
+```bash
+(venv) project/backend$ python manage.py createsuperuser
+```
+
+This will ask for the following:
+- username (required but you can leave it blank, it will take your pc username)
+- email (optional)
+- password (required, you should use a strong password but if you want to test the project you can use `123456`)
+
+Now you can login to the admin panel and add, edit and delete notes from the admin panel.
+
+SO goto the `localhost:8000/admin/` and login with the superuser credentials and add atleast 3 notes so that we can use them in the project.
+
+I just copied and pasted from the `frontend/assets/data.js` file. You can do that too.
+
+If you are done with creating the notes then we can move on to the next part.
+
+We need to Get this ntoes as `json` response. So, goto the `backend/notes/views.py` file and type:
+
+```python
+from django.shortcuts import render
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+from .models import Note # importing the Note model
+
+@api_view(['GET'])
+def getRoutes(request):
+    .....
+
+@api_view(['GET'])
+def getNotes(request):
+    notes = Note.objects.all() # getting all the notes from the database
+    return Response(notes) # returning the notes as json response
+```
+
+Now goto the `localhost:8000/api/notes/` and you should see the notes as `json` response. but you won't. You see an error but no worries. We will fix it.
+
+## Serializing the Data
+
+To make a `json` response from `models` we need to `serialize` the data. 
+
+> serialization is the process of converting an object into a stream of bytes to store the object or transmit it to memory, a database, or a file. Its main purpose is to save the state of an object in order to be able to recreate it when needed. The reverse process is called deserialization.
+
+SO, it's a must to `serialize` the data before we can use it as `json` response. So, amke a new file named `serializers.py` inside the `backend/notes` folder and type:
+
+```python
+from rest_framework import serializers
+
+from .models import Note # importing the Note model
+
+class NoteSerializer(serializers.ModelSerializer): # creating the serializer
+    class Meta:
+        model = Note # adding the Note model
+        fields = '__all__' # adding all the fields of the Note model
+```
+
+This is the `serializer`. It's a class that inherits from the `ModelSerializer` class from the `rest_framework` package. then Inside the class there must be a `Meta` class that has the `model` and `fields` attributes. The `model` attribute is the model we want to serialize and the `fields` attribute is the fields of the model we want to serialize. We can also specify the fields we want to serialize. But for now we will serialize all the fields.
+
+Now we need to use this `serializer` in the `views.py` file. So, goto the `backend/notes/views.py` file and type:
+
+```python
+from django.shortcuts import render
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+from .models import Note
+from .serializers import NoteSerializer # importing the NoteSerializer
+
+@api_view(['GET'])
+def getRoutes(request):
+    .....
+
+@api_view(['GET'])
+def getNotes(request):
+    notes = Note.objects.all()
+    serializer = NoteSerializer(notes, many=True) # serializing the notes, many=True because we are serializing multiple notes
+    return Response(serializer.data) # returning the serialized data
+```
+
+SO, here's what happened here:
+- we imported the `NoteSerializer` from the `serializers.py` file.
+- we fetched the notes from the database.
+- we passed the notes to the `NoteSerializer` and serialized the notes, specified `many=True` because we are serializing multiple notes.
+- we returned the serialized data as `json` response by passing the `serializer.data` to the `Response` function.
+
+>serializer.data is the serialized data.
+
+Now make a route in the `backend/notes/urls.py` file for the `getNotes` function. So, goto the `backend/notes/urls.py` file and type:
+
+```python
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    path('', views.getRoutes),
+    path('notes/', views.getNotes), # adding the route for the getNotes function
+]
+```
+
+Now goto the `localhost:8000/api/notes/` and you should see the notes as `json` response.
+
+> don't forget to add @api_view(['GET']) decorator to all the routes.
+
+## api for a single note
+
+Its the same as the `getNotes` function. 
+
+we need to make an api for a single note. So, goto the `backend/notes/views.py` file and type:
+
+```python
+from django.shortcuts import render
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+from .models import Note
+from .serializers import NoteSerializer
+
+@api_view(['GET'])
+def getRoutes(request):
+    .....
+
+@api_view(['GET'])
+def getNotes(request):
+    .....
+
+@api_view(['GET'])
+def getNote(request, pk): # pk is the primary key of the note
+    note = Note.objects.get(_id=pk) # getting the note from the database
+    serializer = NoteSerializer(note, many=False) # serializing the note, many=False because we are serializing a single note
+    return Response(serializer.data) # returning the serialized data
+```
+
+The only changes we made here is we added a new function named `getNote` and we added a new route for the `getNote` function.
+
+There is another `path` parameter named `pk` in the `getNote` function. This is the `primary key` of the note. We will use this `pk` to get the specific note from the database.
+
+We used `get` method to get the specific note from the database. We can also use `filter` method to get the specific note from the database. But we will use `get` method for now.
+
+and set `many=False` because we are serializing a single note.
+
+Now make a route in the `backend/notes/urls.py` file for the `getNote` function. So, goto the `backend/notes/urls.py` file and type:
+
+```python
+
+.....
+
+urlpatterns = [
+    path('', views.getRoutes),
+    path('notes/', views.getNotes),
+    path('notes/<str:pk>/', views.getNote), # adding the route for the getNote function
+]
+```
+
+> <:str:pk> is the path parameter. We will use this to get the specific note from the database.
+
+Now goto the `localhost:8000/api/notes/1/` and you should see the specific note as `json` response.
+
+
+Well we made the dummy notes. We should connect the `frontend` to the `backend` and get the notes from the database.
+
+# Connecting the Frontend to the Backend
+
+## Connecting the Home Page
+
+We need to connect the `frontend` to the `backend` to get the notes from the database. So, goto the `src/pages/NotesListPage.js` file and type:
+
+```js
+
+.....
+
+const NotesListPage = () => {
+  const [notes, setNotes] = useState([]); // using the useState hook to set the notes
+
+  useEffect(() => {
+    const fetchNotes = async () => { // creating an async function to fetch the notes
+      const { data } = await axios.get("/api/notes/"); // getting the notes from the backend
+      setNotes(data); // setting the notes
+    };
+
+    fetchNotes(); // calling the fetchNotes function
+  }, []);
+
+  return (
+    <div className="notes">
+      <div className="notes-header">
+        <h2 className="notes-title">&#9782; Notes</h2>
+        <p className="notes-count">{notes.length}</p>
+      </div>
+      <div className="notes-list">
+        {notes.map((note) => {
+          return (
+            <div key={note.id}>
+              <ListItem note={note} />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 
 
