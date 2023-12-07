@@ -1,623 +1,95 @@
-# Rango*Notes_App*(django_react)
+<h1 align='center'> Notes app </h1>
+<h4 align='center'> A simple notes app with DJANGO + REACT JS </h4>
 
-I tried to make a react notes app with Django backend
+## Introduction
 
-## How to run the project
+i've been wanting to make a Simple project for beginners to have grasp of how good django and react js are when combined together. So i made this simple notes app. I hope you like it.
 
-### 1. Prerequisites
+This project will have 4 parts:
 
-- Must have python3 installed.
-- Must have nodejs installed.
-- must have prior knowledge of django and react.
+- Implementing the Frontend with React JS
+- Implementing the Backend with Django
+- Connecting the Frontend with the Backend
+- Deploying the project
 
-### 2. Clone the repository.
+## Requirements
 
-### 3. Create a virtual environment and install dependencies from requirements.txt:
+- Python 3.6+
+- Django 4.0+
+- React JS 18
 
-```bash
-$ python3 -m venv venv
-```
+## Prerequisites
 
-```bash
-$ source venv/bin/activate
-```
+- NODE JS should be installed in your system
+- Python and pip should be installed in your system
 
-```bash
+Thats it and you need to know the basic of Djnago, The Django Rest Framework and React JS.
 
-$ pip install -r requirements.txt
-```
+SO, lets start.
 
-### 3. Run the development server:
+# Frontend
 
-```bash
-$ python manage.py runserver
-```
+## Creating the React App
 
-### 4. Open localhost:8000 in the browser.
-
-## so lets get started
-
-# table of Content:
-
-- [1. Create a Django Project](#1-create-a-django-project)
-- [2. Create a Django App](#2-create-a-django-app)
-- [3. Create a Django View](#3-create-a-django-view)
-- [4. Create a Django URL](#4-create-a-django-url)
-- [5. Create a Django Model](#5-create-a-django-model)
-- [6. Create a Django Admin](#6-create-a-django-admin)
-- [7. Create a Django Serializer](#7-create-a-django-serializer)
-- [8. Create a Django API View](#8-create-a-django-api-view)
-- [9. Create a React App](#9-create-a-react-app)
-- [10. Create a React Component](#10-create-a-react-component)
-- [11. Making a Api Call](#11-making-a-api-call)
-- [12. Create a React Router](#12-create-a-react-router)
-- [13. connect React with Django](#13-connect-react-with-django)
-- [14. Testing the App](#14-testing-the-app)
-- [15. Deploying the App](#15-deploying-the-app)
-
-## 1. Create a Django Project
-
-First we need a virtual environment to install Django and other dependencies. So, let’s create a virtual environment using the following command:
+First of all, we need to create a `React App`. To do that first make a directory for the project and then open the terminal in that directory and type:
 
 ```bash
-$ python3 -m venv venv
+npx create-react-app frontend
 ```
 
-Now, activate the virtual environment using the following command:
+> this will create a react app named `frontend` in the directory.
+
+Now if you look at the directory you should see something like this:
 
 ```bash
-$ source venv/bin/activate
+frontend
+├── README.md
+├── node_modules
+├── package.json
+├── .gitignore
+├── public
+│   ├── favicon.ico
+│   ├── index.html
+│   ├── logo192.png
+│   ├── logo512.png
+│   ├── manifest.json
+│   └── robots.txt
+└── src
+    ├── App.css
+    ├── App.js
+    ├── App.test.js
+    ├── index.css
+    ├── index.js
+    ├── logo.svg
+    └── reportWebVitals.js
+    └── setupTests.js
 ```
 
-for windows:
+this is the usual structure of a react app. We will do most of our work inside the `src` directory. After we are done with the `frontend` part we will goto the `backend` part.
+
+We might not need to touch the other files but the `src` folder. SO, now lets start the development server. To do that type:
 
 ```bash
-$ venv\Scripts\activate
+cd frontend
+
+npm start
 ```
 
-Now, install Django using the following command:
+> this will start the development server at `localhost:3000` in your browser and reload the page if you make any changes to the code.
 
-```bash
-$ pip install django
-```
+## Creating the Components
 
-now we can create our django project.
+Before creating a component lets delete the files that we dont need. To do that first delete the ``App.test.js`, `logo.svg`, `reportWebVitals.js` and `setupTests.js` files. We need to keep the `index.js`, `App.js` and `App.css` files.
 
-SO, let’s create a Django project using the following command:
+Then goto the `src/app.js` file and edit the file to look like this:
 
-```bash
-$ django-admin startproject backend
-```
-
-this will create a folder named backend which will contain all the files and folders related to our Django project. There will be a folder inside the `backend folder` named `backend` which will contain all the files and folders related to our Django project. likr this:
-
-```bash
-backend
-├── backend
-│   ├── __init__.py
-│   ├── asgi.py
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
-└── manage.py
-```
-
-Now, let’s run the Django development server using the following command:
-
-```bash
-$ cd backend
-```
-
-> Note: Make sure you are in the same directory where the `manage.py` file is located.
-
-```bash
-$ python manage.py runserver
-```
-
-this will serve your project at `http://127.0.0.1:8000/`
-
-> i'll use `localhost:8000` instead of the above url. so if you see `localhost:8000` in the code, you should know that i'm talking about `http://127.0.0.1:8000/`
-
-I you wrote the commands correctly you will see a page with a rocket trying to lift off. thats the default django page. now we can move on to the next step.
-
-## 2. Create a Django App
-
-Now, let’s create a Django app using the following command:
-
-```bash
-$ python manage.py startapp notes_api
-```
-
-this will create a folder named notes which will contain all the files and folders related to our Django app. This python files wiil be used to create our views, our models, our serializers, our urls, etc. like this:
-
-```bash
-backend
-├── backend
-├── notes_api
-│   ├── __init__.py
-│   ├── admin.py
-│   ├── apps.py
-│   ├── migrations
-│   ├── models.py
-│   ├── serializers.py
-│   ├── tests.py
-│   └── views.py
-└── manage.py
-```
-
-Now, we need to add the newly created app in the`settings.py` file in our `backend` folder. So, open the `backend/settings.py` file and add the following code in the `INSTALLED_APPS` list:
-
-```python
-INSTALLED_APPS = [
-    ...
-    'notes_api',
-]
-```
-
-## 3. Create a Django View
-
-SO, we are actually creating a notes app. The app will give us the ability to create, read, update and delete notes. But, Here we are using the React framework to create the frontend of our app. So, we only need the `JSON` data from our backend. So, we will create a view which will return the `JSON` data. So, let’s create a view using the following code in the `notes_api/views.py` file:
-
-```python
-from django.shortcuts import render
-from django.http import JsonResponse # new
-
-# function to handle the request of the route
-def routes(request):
-    routes = {
-        'notes': '/notes',
-        'notes detail': '/notes/<str:pk>',
-    } # new
-    return JsonResponse(routes,safe=False) # send the json response
-```
-
-> Note: we are using the `JsonResponse` class to send the `JSON` response and the `safe=False` argument is used to send objects other than dict.
-
-## 4. Create a Django URL
-
-Now, we need to create a URL for our view. So, let’s create a URL using the following code in the `notes_api/urls.py` file:
-
-```python
-from django.urls import path
-from .views import routes # new
-
-urlpatterns = [
-    path('', routes, name='routes'), # new
-]
-```
-
-Now, we need to include the newly created URL in the `backend/urls.py` file. So, open the `backend/urls.py` file and add the following code:
-
-```python
-
-from django.contrib import admin
-from django.urls import path, include # new
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('notes_api.urls')), # new
-]
-```
-
-now we can test our app. so, run the development server using the following command:
-
-```bash
-$ python manage.py runserver
-```
-
-and open `http://localhost:8000/` in the browser. you will see the following `JSON` response:
-
-```json
-{
-  "notes": "/notes",
-  "notes detail": "/notes/<str:pk>"
-}
-```
-
-but this won't be well formatted, the `rest framework` will help us with that.
-
-lets go to the `notes_api/views.py` file a add some more routes inside the `routes` function:
-
-```python
-from django.shortcuts import render
-from django.http import JsonResponse
-# Create your views here.
-
-# function that returns a JSON response of all the routes in the API
-def routes(request):
-    routes = [
-        {
-            'Endpoint': '/notes/',
-            'method': 'GET',
-            'body': None,
-            'description': 'Returns an array of notes'
-        },
-        {
-            'Endpoint': '/notes/id',
-            'method': 'GET',
-            'body': None,
-            'description': 'Returns a single note object'
-        },
-        {
-            'Endpoint': '/notes/create/',
-            'method': 'POST',
-            'body': {'body': ""},
-            'description': 'Creates new note with data sent in post request'
-        },
-        {
-            'Endpoint': '/notes/id/update/',
-            'method': 'PUT',
-            'body': {'body': ""},
-            'description': 'Creates an existing note with data sent in post request'
-        },
-        {
-            'Endpoint': '/notes/id/delete/',
-            'method': 'DELETE',
-            'body': None,
-            'description': 'Deletes and exiting note'
-        },
-    ]
-    return JsonResponse(routes,safe=False)
-```
-
-Nothing much has changed, we just added some more routes to the `routes` function. now if you go to `http://localhost:8000/` you will see the following `JSON` response:
-
-```json
-[
-  {
-    "Endpoint": "/notes/",
-    "method": "GET",
-    "body": null,
-    "description": "Returns an array of notes"
-  },
-  {
-    "Endpoint": "/notes/id",
-    "method": "GET",
-    "body": null,
-    "description": "Returns a single note object"
-  },
-  {
-    "Endpoint": "/notes/create/",
-    "method": "POST",
-    "body": { "body": "" },
-    "description": "Creates new note with data sent in post request"
-  },
-  {
-    "Endpoint": "/notes/id/update/",
-    "method": "PUT",
-    "body": { "body": "" },
-    "description": "Creates an existing note with data sent in post request"
-  },
-  {
-    "Endpoint": "/notes/id/delete/",
-    "method": "DELETE",
-    "body": null,
-    "description": "Deletes and exiting note"
-  }
-]
-```
-
-a one line `JSON` response. now we need to install the `rest framework` to make it look better. but before that lets make a `model` for our notes.
-
-## 5. Create a Django Model
-
-Now, we need to create a model for our notes. So, let’s create a model using the following code in the `notes_api/models.py` file:
-
-```python
-from django.db import models
-
-# Create your models here.
-
-class Note(models.Model):
-    body = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.body[0:50] + "..."
-```
-
-Now, we need to migrate the model to the database. So, run the following command:
-
-```bash
-$ python manage.py makemigrations
-```
-
-this will create a migration file in the `notes_api/migrations` folder. Now, run the following command to migrate the model to the database:
-
-```bash
-$ python manage.py migrate
-```
-
-Now, we need to register the model in the `notes_api/admin.py` file. So, open the `notes_api/admin.py` file and add the following code:
-
-```python
-from django.contrib import admin
-from .models import Note # new
-
-# Register your models here.
-admin.site.register(Note) # new
-```
-
-Now, run the development server using the following command:
-
-```bash
-$ python manage.py runserver
-```
-
-and open `http://localhost:8000/admin` in the browser. you will see the admin page. now login using the superuser credentials. you will see the `Notes` model there. now we can add, edit and delete notes from the admin page.
-
-## 6. Create a Django Admin
-
-Now, we need to create a Django admin. We can create a super user who can access the admin page and add, edit and delete notes. So, let’s create a super user using the following command:
-
-```bash
-$ python manage.py createsuperuser
-```
-
-Now, enter the username, email and password for the super user. Now, run the development server and go to the admin page. Now, login using the super user credentials. You will see the `Notes` model there, along with other models. Now, we can add, edit and delete notes from the admin page.
-
-## 7. Create a Django Serializer
-
-whats a serializer? A serializer is a class that converts the model data into JSON so that the frontend can use the data easily. For this we need to install the `djangorestframework` using the following command:
-
-```bash
-$ pip install djangorestframework
-```
-
-We have to add the `rest_framework` in the `INSTALLED_APPS` list in the `backend/settings.py` file. So, open the `backend/settings.py` file and add the following code in the `INSTALLED_APPS` list:
-
-```python
-INSTALLED_APPS = [
-    ...
-    'rest_framework',
-    'notes_api',
-]
-```
-
-Now lets go to the `notes_api/views.py` to get the data formatted by the help of the `rest_framework`. So, open the `notes_api/views.py` file and add the following code:
-
-```python
-from django.shortcuts import render
-from django.http import JsonResponse
-from rest_framework.response import Response # new
-from rest_framework.decorators import api_view # new
-
-@api_view(['GET']) # new
-def routes(request):
-    routes = [
-        ....
-    ]
-    return Response(routes) # new
-```
-
-> Note: we are using the `Response` class to send the `JSON` response and the `api_view` decorator to specify the type of request. This will also help us to add more request types in the future and format the data accordingly.
-
-Now, run the development server and you should see the default `rest framework` page. And the json data well formatted. There are some options that you can explore. SO feel free to explore. now we can move on to the next step.
-
-now, you should make some dummy data by going to the admin page and adding some notes. So that we can see the data in the frontend but as we are making a api we need to get the data from the database in `json` format. SO go to the admin page `localhost:8000/admin` and add some notes.
-
-Now lets serialize the data inot json format.
-
-> Note: `Serializers` are used to convert the model data into JSON so that the frontend can use the data easily.
-
-SO, first make a new file named `serializers.py` in the `notes_api` folder. and add the following code in it:
-
-```python
-from rest_framework import serializers
-from .models import Note
-
-class NoteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Note
-        fields = '__all__'
-```
-
-> Note: we are using the `ModelSerializer` class to serialize the model data. We are also using the `Note` model and all the fields of the model. You can also specify the fields that you want to serialize by using the `fields` list instead of `__all__`.
-
-This is the general structure of a serializer. Now, we need to serialize the data in our view.
-
-## 8. Create a Django API View
-
-The `rest_framework` provides us with a class based view called `APIView` which we can use to create our API views. So, let’s create an API view using the following code in the `notes_api/views.py` file:
-
-```python
-from django.shortcuts import render
-# from django.http import JsonResponse
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from .serializers import NoteSerializer # new
-from .models import Note # new
-
-@api_view(['GET'])
-def routes(request):
-    routes = [
-        ...
-    ]
-    return Response(routes)
-
-@api_view(['GET'])
-def getNotes(request):
-    notes = Note.objects.all() # new
-    serializer = NoteSerializer(notes, many=True) # new
-    return Response(serializer.data) # new
-```
-
-> Note: we are using the `NoteSerializer` class to serialize the data. We are also using the `Note` model to get all the notes from the database. We are also using the `many=True` argument to specify that there are many notes. You can also use `many=False` if you are getting a single object.
-
-> Note: `Note.objects.all()` will get all the notes from the database. You can also use `Note.objects.get(id=pk)` to get a single note from the database.
-
-Here, we are using the `GET` request to get all the notes from the database. Now, we need to create a URL for our view. So, let’s create a URL using the following code in the `notes_api/urls.py` file:
-
-```python
-from django.urls import path
-from . import views
-
-urlpatterns = [
-    path('', views.routes, name='routes'),
-    path('notes/', views.getNotes, name='notes'), # new
-]
-```
-
-Now, run the development server and go to `http://localhost:8000/notes/` in the browser. You will see that the data from our model is serialized and returned in `JSON` format. This the data that we will use in our frontend.
-
-Now we can create the `api_view` for the `GET` request to get a single note from the database. So, let’s create an API view using the following code in the `notes_api/views.py` file:
-
-```python
-from django.shortcuts import render
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from .serializers import NoteSerializer
-from .models import Note
-
-@api_view(['GET'])
-def routes(request):
-    ....
-
-@api_view(['GET'])
-def getNotes(request):
-    ....
-
-@api_view(['GET'])
-def getNote(request, pk): # new
-    note = Note.objects.get(id=pk) # new
-    serializer = NoteSerializer(note, many=False) # new
-    return Response(serializer.data) # new
-```
-
-> Note: we are using the `getNote` function to get a single note from the database. We are also using the `pk` argument to get the note with the specified id. We are also using the `many=False` argument to specify that there is only one note.
-
-Now, we need to create a URL for our view. So, let’s create a URL using the following code in the `notes_api/urls.py` file:
-
-```python
-from django.urls import path
-from . import views
-
-urlpatterns = [
-    path('', views.routes, name='routes'),
-    path('notes/', views.getNotes, name='notes'),
-    path('notes/<str:pk>', views.getNote, name='note'), # new
-]
-```
-
-> Note: we are using the `str` data type for the `pk` argument. You can also use `int` if you are using an integer id. this will be used to get a single note from the database and the `pk` will be used to specify the id of the note.
-
-Now, run the development server and go to `http://localhost:8000/notes/1` in the browser. You will see that the data from our model is serialized and returned in `JSON` format. This the data that we will use in our frontend.
-
-## 9. Create a React App
-
-Now, we need to create a React app. So, let’s create a React app using the following command:
-
-```bash
-$ cd ..
-$ npx create-react-app frontend
-```
-
-> Note: `cd ..` will take you to the parent directory. Because we need to create the React app in the parent directory alongside the backend folder. so the folder structure will look like this:
-
-```bash
-parent_directory
-├── backend
-|   ├── backend
-|   ├── notes_api
-|   └── manage.py
-└── frontend
-    ├── node_modules
-    ├── public
-    ├── src
-    ├── .gitignore
-    ├── package-lock.json
-    ├── package.json
-    └── README.md
-```
-
-Now lets start the react app using the following command:
-
-```bash
-$ cd frontend
-$ npm start
-```
-
-this will serve your project at `http://localhost:3000/` and you will see the default react page. now we can move on to the next step.
-
-## 10. Create a React Component
-
-we will open the `frontend` and we dont really need some files and folders so we can remove them. so remove the following files and folders:
-
-- `src/App.test.js`
-- `src/index.css`
-- `src/logo.svg`
-- `src/serviceWorker.js`
-- `src/setupTests.js`
-- `src/reportWebVitals.js`
-
-Deleting these files will cause some errors so lets fix those errors too. Its pretty simple to remove those error, we just need to go to the `src/index.js` file and keep the following code:
-
-```javascript
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App";
-
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
-```
-
-And we can remove the rest.
-also in the `src/App.js` file we can the following code:
-
-```javascript
+```js
 import "./App.css";
-
-function App() {
-  return <div className="App">My App</div>;
-}
-
-export default App;
-```
-
-everything else can be removed. now we can create our first component. so lets create a folder named `components` in the `src` folder. and create a file named `Header.js` and `Footer.js` in the `components` folder. and add the following code in it:
-
-```javascript
-import React from "react";
-
-function Header() {
-  return <div>Header</div>;
-}
-
-export default Header;
-```
-
-for the `Footer.js` file:
-
-```javascript
-import React from "react";
-
-function Footer() {
-  return <div>Footer</div>;
-}
-
-export default Footer;
-```
-
-> Note: remember to capitalize the first letter of the component name. otherwise it will not work.
-
-now we can import these components in the `App.js` file and use them. so lets import them in the `App.js` file:
-
-```javascript
-import "./App.css";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
 
 function App() {
   return (
     <div className="App">
-      <Header /> {/* new */}
-      My app
-      <Footer /> {/* new */}
+      <h1>Hello World</h1>
     </div>
   );
 }
@@ -625,37 +97,73 @@ function App() {
 export default App;
 ```
 
-now we can see the `Header` and `Footer` component in the browser. now we can move on to the next step.
+This will render a `Hello world` text in the browser in the mid-top of the page that because of the `app.css` file that has some stylling from before , so Goto the `src/app.css` file and remove all the code and you will see only the `Hello world` text in the browser.
 
-## 11. Making a Api call
+Now lets make the first component. Make a new `folder` named `components` inside the `src` directory and inside the newly made `components` folder make a new file made `Header.js`
 
-We have a header and footer component. now we need to create a component for the home page. so lets create a file named `NotesListPage.js` in a new folder, I named the folder `Pages` folder and add the following code in it:
+> the component name should be in `PascalCase` and the file name should match the component name.
 
-```javascript
+Now open the `Header.js` file and type:
+
+```js
 import React from "react";
 
-function NotesListPage() {
-  return <div>Notes List Page</div>;
+const Header = () => {
+  return (
+    <div>
+      <h1>Notes App</h1>
+    </div>
+  );
+};
+
+export default Header;
+```
+
+this will not render anything in the browser because we have not imported the `Header` component in the `App.js` file. So, goto the `src/App.js` file and import the `Header` component like this:
+
+```js
+import "./App.css";
+import Header from "./components/Header";
+
+function App() {
+  return (
+    <div className="App">
+      <Header />
+    </div>
+  );
 }
+
+export default App;
+```
+
+Now you should see the `Notes App` text in the browser. This component is for every page in the site. But I want to keep my common and specific page components separate. So, I will make a new folder named `pages` inside the `src` directory and inside the `pages` folder I will make a new file named `NotesListPage.js` and type:
+
+```js
+import React from "react";
+
+const NotesListPage = () => {
+  return (
+    <div>
+      <h1>Notes List Page</h1>
+    </div>
+  );
+};
 
 export default NotesListPage;
 ```
 
-now we can import this component in the `App.js` file and use it. so lets import it in the `App.js` file:
+Then again goto the `src/App.js` file and import the `NotesListPage` component like this:
 
-```javascript
+```js
 import "./App.css";
 import Header from "./components/Header";
-import Footer from "./components/Footer";
 import NotesListPage from "./pages/NotesListPage";
 
 function App() {
   return (
     <div className="App">
       <Header />
-      <NotesListPage /> {/* new */}
-      {/*My app*/}
-      <Footer />
+      <NotesListPage />
     </div>
   );
 }
@@ -663,253 +171,621 @@ function App() {
 export default App;
 ```
 
-now we can see the `NotesListPage` component in the browser.
+The `Header` component will become the `navbar` of the site and the `NotesListPage` component will become the `home` page of the site. But In this state its hard to make a website without any data. So, here are some dummy data that we will use in the project:
 
-Now, we need to make an API call to get the data from our backend. So, let’s make an API call using the following code in the `NotesListPage.js` file:
+```js
+let notes = [
+  {
+    id: 1,
+    body: "Todays Agenda\n\n- Walk Dog\n- Feed fish\n- Play basketball\n- Eat a salad",
+    updated: "2021-07-14T13:49:02.078653Z",
+    created: "2021-07-13T21:54:16.235392Z",
+  },
+  {
+    id: 2,
+    body: "Bob from bar down the \n\n- Take out trash\n- Eat food",
+    updated: "2021-07-13T20:43:18.550058Z",
+    created: "2021-07-13T00:17:13.289897Z",
+  },
+  {
+    id: 3,
+    body: "Wash car",
+    updated: "2021-07-13T19:46:12.187306Z",
+    created: "2021-07-13T00:16:22.399841Z",
+  },
+];
 
-```javascript
-import React, { useState, useEffect } from "react"; // new
-
-function NotesListPage() {
-  let [notes, setNotes] = useState([]); // new
-
-  let getNotes = async () => {
-    // new
-    let response = await fetch("http://localhost:8000/api/notes/"); // new
-    let data = await response.json(); // new
-    setNotes(data); // new
-  }; // new
-
-  return (
-    <div>
-      <div>
-        {/* mapping the notes array we got from django rest framework*/}
-        {notes.map((note) => (
-          <div key={note.id}>{note.body}</div>
-        ))}
-      </div>{" "}
-      {/* new */}
-    </div>
-  );
-}
+export default notes;
 ```
 
-> Note: we are using the `useState` hook to create a state variable named `notes` and the `useEffect` hook to make the API call when the component is rendered. We are also using the `fetch` function to make the API call and the `json` function to convert the response into JSON. We are also using the `map` function to loop through the `notes` array and display the notes.
+Before copying this data make a new folder named `assets` inside the `src` folder and make a new file named `data.js` inside that file copy the above data and paste it.
 
-So what we are doing here is we are making an api call to the `http://localhost:8000/api/notes/` url and getting the data from the backend. and we are storing the data in the `notes` state variable. and we are looping through the `notes` array and displaying the notes.
+Now we have some dummy data to use in the project. So, lets render the data in the `NotesListPage` component. To do that first import the `notes` data in the `NotesListPage` component like this:
 
-Now this will give us an error because we are trying to get data from the `http://localhost:8000/api/notes/` url but we dont have that url in our backend. So lets fix that by going to the `backend/urls.py` file and adding the following code:
-
-```python
-
-from django.contrib import admin
-from django.urls import path,include
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/',include('notes_api.urls')) # new
-]
-
-```
-
-> Note: we are using the `include` function to include the `notes_api/urls.py` file in the `backend/urls.py` file. We are also using the `api` prefix for the `notes_api/urls.py` file. So, we need to add the `api` prefix in the `notes_api/urls.py` file.
-
-I created the view for that so to double check go to `http://localhost:8000/api/notes/` and you will see the data in `json` format.
-
-Now if you did everything right you should see the notes in you react server but there will be another error. the error will be something like this:
-
-```bash
-cors error
-```
-
-this is because we are trying to get data from a different server. so we need to install a package named `django-cors-headers` using the following command:
-
-```bash
-$ pip install django-cors-headers
-```
-
-now we need to add the `corsheaders` in the `INSTALLED_APPS` list in the `backend/settings.py` file. So, open the `backend/settings.py` file and add the following code in the `INSTALLED_APPS` list:
-
-```python
-INSTALLED_APPS = [
-    ...
-    'rest_framework',
-    'notes_api',
-    'corsheaders', # new
-]
-```
-
-now we need to add the `corsheaders` middleware in the `MIDDLEWARE` list in the `backend/settings.py` file. So, open the `backend/settings.py` file and add the following code in the `MIDDLEWARE` list:
-
-```python
-MIDDLEWARE = [
-    ...
-    'corsheaders.middleware.CorsMiddleware', # new
-    'django.middleware.common.CommonMiddleware', # new
-]
-```
-
-now we need to add the `CORS_ORIGIN_ALLOW_ALL` in the `backend/settings.py` file. So, open the `backend/settings.py` file and add the following code:
-
-```python
-CORS_ORIGIN_ALLOW_ALL = True # new
-```
-
-> Note: we are using the `CORS_ORIGIN_ALLOW_ALL` to allow all the origins to make the API call. You can also specify the origins that you want to allow by using the `CORS_ORIGIN_WHITELIST` list. You can know more about the `django-cors-headers` package from the [official documentation](https://pypi.org/project/django-cors-headers/).
-
-now you should restart the django server and you see the notes in the react server.
-
-If you did everything right you should see the notes in your react server.
-
-We can make it cleaner by making another component for the notes. so lets create a file named `ListItem.js` in the `components` folder and add the following code in `components/ListItem.js` file:
-
-```javascript
+```js
 import React from "react";
 
-function ListItem({ note }) {
-  return <div>{note.body}</div>;
-}
+import notes from "../assets/data"; // importing the data
+
+const NotesListPage = () => {
+  return (
+    <div>
+      {/* render the data using map function */}
+      {notes.map((note) => {
+        return (
+          <div key={note.id}>
+            <h2>{note.body}</h2>
+            <p>{note.updated}</p>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+export default NotesListPage;
+```
+
+> we have to use the map function to render the data because the data is in array format and arrays dont have the `body` and `updated` properties. So, we have to use the map function to access the data.
+
+Now you can see the data in the browser. But editing the data this way can be very messy so, I'll make a component for a single Item. So, make a new file named `ListItem.js` inside the `components` folder and type:
+
+```js
+import React from "react";
+
+const ListItem = () => {
+  return <div>ListItem</div>;
+};
 
 export default ListItem;
 ```
 
-> this component will take a prop named `note` and display the `note.body` in the browser.
+now import and add this to the `NotesListPage` component like this:
 
-now we can import this component in the `NotesListPage.js` file and use it. so lets import it in the `NotesListPage.js` file:
-
-```javascript 
-import React from "react";
-import { useState, useEffect } from "react";
-import ListItem from "../component/ListItem"; {/* new */}
-
+```js
+.....
 const NotesListPage = () => {
-  let [notes, setNotes] = useState([]);
-  useEffect(() => {
-    getNotes();
-  }, []);
-
-  let getNotes = async () => {
-    let response = await fetch("http://127.0.0.1:8000/api/notes/");
-    let data = await response.json();
-    setNotes(data);
-  };
-
   return (
     <div>
-      <div className="notes_list">
-        {notes.map((note, index) => (
-          <ListItem key={index} note={note} /> {/* new */}
-        ))}
-      </div>
+        {notes.map((note)=>{
+            return(
+                <div key={note.id}>
+                    <ListItem />
+                </div>
+            )
+        })}
     </div>
-  );
-};
-
-export default NotesListPage;
+  )
+}
+.....
 ```
 
-> Note: we are using the `ListItem` component to display the notes. We are also using the `note` prop to pass the note to the `ListItem` component. We are also using the `key` prop to specify the key for the `ListItem` component. We are also using the `index` argument to specify the index of the note.(else we will get an error)
+Now the `ListItem` will e rendered for every item in the `notes` array.
 
-now we can see the notes in the browser. And its a little less complicated.
+As we have 4 Items in the `notes` array we will see 4 `ListItem` components in the browser. But we need to pass the data to the `ListItem` component so that we can render them and edit them separately. To do that we need to pass the `notes` data as a `prop` to the `ListItem` component. So, goto the `NotesListPage` component and edit the `ListItem` component like this:
 
-You might still face some errors but once you add the proxy in the `package.json` file it will work fine. so lets add the proxy in the `package.json` file:
-
-```json
-{
-  {
-  "name": "frontend",
-  "proxy": "http://127.0.0.1:8000", // new
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
-  },
-  ....
-```
-
-> Note: we are using the `proxy` to specify the backend url. You can also use the full url in the `fetch` function. But using the `proxy` is a better option.
-
-now we can use this link without specifying the full url. so lets change the `fetch` function in the `NotesListPage.js` file:
-
-```javascript
-import React from "react";
-import { useState, useEffect } from "react";
-import ListItem from "../component/ListItem";
+```js
+.....
 
 const NotesListPage = () => {
-  let [notes, setNotes] = useState([]);
-  useEffect(() => {
-    getNotes();
-  }, []);
-
-  let getNotes = async () => {
-    let response = await fetch("/api/notes/"); {/*no need to specify the full url*/} 
-    let data = await response.json();
-    setNotes(data);
-  };
-
   return (
     <div>
-      <div className="notes_list">
-        {notes.map((note, index) => (
-          <ListItem key={index} note={note} />
-        ))}
-      </div>
+        {notes.map((note)=>{
+            return(
+                <div key={note.id}>
+                    <ListItem note={note}/>
+                </div>
+            )
+        })}
     </div>
-  );
-};
-
-export default NotesListPage;
+  )
+}
+export default ListItem
 ```
 
-now we can see the notes in the browser without any errors.
+> remember that twe need to pass the key prop to the parent element of the map function. So, we need to pass the key prop to the `div` element.
 
-## 12. Create a React Router
+Now this way we can access the `note` data in the `ListItem` component. So, goto the `ListItem` component and edit the component like this:
 
-Now that we fetched the data from the backend we need to create a router so that we can navigate to different pages.
+```js
+.....
 
-So, let’s install the `react-router-dom` package using the following command:
+const ListItem = (note) => {
+  const {id, title, body, created, updated} = note.note
+  console.log(id, title, body, created, updated);
+  return (
+    <div>
+        <h3>{body}</h3>
+        <p>Created: {created}</p>
+        <p>Updated: {updated}</p>
+    </div>
+  )
+}
+
+.....
+```
+
+This will render the data in the browser. We will make some aditional chages to the `ListItem` component later. For now we will lets this be like this.
+
+and move on to the next part.
+
+we have the structure of the `home` page but we need another page for making changes to individual notes. For that react has a feature called `routing`. This make the site behave like a `SPA` (Single Page Application).
+
+# React Routing
+
+Lets make a new component named `NotePage.js` inside the `pages` folder and type:
+
+```js
+import React from "react";
+
+const NotePage = () => {
+  return <div>NotePage</div>;
+};
+
+export default NotePage;
+```
+
+and as always import and add this component to the `App.js` file like this:
+
+```js
+.....
+
+const App = () => {
+  return (
+    <div className="App">
+      <Header />
+      <NotesListPage />
+      <NotePage />
+    </div>
+  )
+}
+
+export default App
+```
+
+now you will see that the page is not acting like a new page. It's just another component that is rendered in the same page.
+
+To fix this issue we need to use `React-Router`. To do that first install the `react-router-dom` package by typing:
 
 ```bash
-$ npm install react-router-dom
+npm install react-router-dom
 ```
 
-> this will install the `react-router-dom` package in our project. We will use this package to create the router. You can know more about the `react-router-dom` package from the [official documentation](https://reactrouter.com/en/6.17.0/start/tutorial).
+> this will install the `react-router-dom` package in the project.
 
-To route the page we need to wrap the `App` component with the `Router` component. So, let’s wrap the `App` component with the `Router` component using the following code in the `src/App.js` file:
+`react-router-dom` is a package that helps us to make the site behave like a `SPA`. It give use some components that we can use to make the site behave like a `SPA`.
 
-```javascript
-....
-{/*importing the BrowserRouter component from react-router-dom*/}
+SO lets make another page and lets see how it works.
 
-import { Route, BrowserRouter as Router } from "react-router-dom"; {/* new */}
-import { Routes } from "react-router-dom"; {/* new */}
+goto the `src/App.js` file and import the `BrowserRouter` and `Route` component from the `react-router-dom` package and wrap every thing inside the `BrowserRouter` component like this:
+
+```js
+.....
+// importing browser router, routes and route component
+import { BrowserRouter as Router,Routes, Route } from "react-router-dom";
 
 function App() {
   return (
-    <Router> {/* new */}
+    <Router>
       <div className="App">
         <Header />
-        <Routes> {/* new */}
-          <Route path="/" element={<NotesListPage />} />
-        </Routes> {/* new */}
-        <Footer />
+        <NotesListPage />
       </div>
-    </Router> {/* new */}
+    </Router>
+  );
+}
+....
+```
+
+> wrap all the components inside the `Router` component.
+
+Now we cna specify which component to render in which path. To do that we need to use the `Route` component. So, goto the `src/App.js` file and import the `NotePage` component and add the `Route` component like this:
+
+```js
+.....
+
+import NotePage from "./pages/NotePage";
+
+function App() {
+  return (
+    <Router>
+      <div className="App">
+        <Header />
+        <Routes> {/* adding the routes component to render specific components for a path*/}
+
+          <Route path="/" element={<NotesListPage />} /> {/* rendering the NotesListPage component for the home page */}
+          <Route path="/note" element={<NotePage />} /> {/* rendering the NotePage component for the /note page */}
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
-....
+export default App;
 ```
-> Note: we are using the `Route` component to specify the route for the `NotesListPage` component. We are also using the `path` prop to specify the path for the `NotesListPage` component. We are also using the `element` prop to specify the component for the `NotesListPage` component. We are also using the `Routes` component to specify the routes for the `App` component. We are also using the `Router` component to wrap the `App` component.
+
+Now if you goto the `localhost:3000` you will see the `NotesListPage` component and if you goto the `localhost:3000/note` you will see the `NotePage` component only and you should seee that the pages are not reloading. This is how a `Single Page Application` works.
+
+Now we need to make the the `Home Page` as so that we can click a Note and goto the `NotePage` component and see the details of the Notes in that page. We need a `Dynamic Route` for that.
+
+When anyone will click in a Note in the Home page that will take use to the `NotePage` where the Details of the notes will be shown and this will happen if we can pass the `id` of the note to the `NotePage` component. But we need a specific path for that. So, goto the `src/App.js` file and edit the `Route` component like this:
+
+```js
+
+.....
+
+import NotePage from "./pages/NotePage";
+
+function App() {
+  return (
+    <Router>
+      <div className="App">
+        <Header />
+        <Routes>
+          <Route path="/" element={<NotesListPage />} />
+          <Route path="/note" element={<NotePage />} />
+          <Route path="/note/:id" element={<NotePage />} /> {/* adding the dynamic route */}
+        </Routes>
+      </div>
+    </Router>
+  );
+}
+
+export default App;
+```
+
+> the `:id` is the dynamic part of the route. This will be replaced by the `id` of the note. We can pass `....../note/1` or `....../note/2` or `....../note/3` and so on. This will be the `id` of the note. Which them we will query the note from the database.
+
+After doing this try any path in your browser URL and you will see that the `NotePage` component is rendered.
+
+Now how do we get the id from the URL and then use this id to query the note from the database. For that we need to use the `useParams` hook from the `react-router-dom` package. So, goto the `src/pages/NotePage.js` file and import the `useParams` hook like this:
+
+```js
+import React from "react";
+
+import { useParams } from "react-router-dom"; // importing the useParams hook
+
+const NotePage = () => {
+  const params = useParams(); // using the useParams hook
+  console.log(params);
+  return <div>NotePage</div>;
+};
+
+export default NotePage;
+```
+
+You should see the `id` in the console. Now we can use this `id` to query the note from the data. Now, lets use the `id` we got from the URL to get the specific note from the data. To do that goto the `src/pages/NotePage.js` file and import the `notes` data and use the `id` to get the specific note like this:
+
+```js
+import React from "react";
+
+import { useParams } from "react-router-dom";
+
+import notes from "../assets/data"; // importing the notes data
+
+const NotePage = () => {
+  const { id } = useParams();
+  const note = notes.find((note) => note.id === Numberid)); // using the id to get the specific note
+  console.log(note);
+  return <div>NotePage</div>;
+};
+```
+
+Now you should see the notes of the specific id in the console. Now we can use this data to render the data in the `NotePage` component. So, goto the `src/pages/NotePage.js` file and render the data like this:
+
+```js
+.....
+
+const NotePage = () => {
+  const { id } = useParams();
+  const note = notes.find((note) => note.id === Number(id));
+  return (
+    <div>
+      <div>
+        <h2>{note.body}</h2>
+        <p>{note.updated}</p>
+      </div>
+    </div>
+  );
+};
+
+export default NotePage;
+```
+
+Now you should see the data in the browser. Now lets link the Item to the `NotePage` component. To do that goto the `src/components/ListItem.js` file and import the `Link` component from the `react-router-dom` package and do what I do:
+
+```js
+.....
+import { Link } from "react-router-dom"; //importing the Link component
+const ListItem = (note) => {
+  const { id, title, body, created, updated } = note.note;
+
+  return (
+    <div>
+      <Link to={`note/${id}`}> {/*wrapping the item with the Link component and passing the id to the path*/}
+        <h3>{body}</h3>
+        <p>Created: {created}</p>
+        <p>Updated: {updated}</p>
+      </Link>
+    </div>
+  );
+};
+.....
+```
+
+> link component will make the item clickable and the `to` prop will take us to the `NotePage` component with the specific id.
+
+Now if you click the item you will see the `Notepage` without the browser reloading.
+
+We have done most of the frontend part but it does not look good. So, lets add some styling to the project.
+
+# Styling the project
+
+I'll not go into much detail about the styling part. I'll just show you the code and you can copy and paste the styling part in the `src/app.css` file.
+
+Get the code from my github repo: https://github.com/RishatTalukder/Rango_Notes_App_-django_react-
+
+then go to the `src/app.css` file and copy the css code from the `app.css` file and paste it in the `src/app.css` file in your project.
+
+Now if you look at the code you will see there are some color variable set and the stylling is set for different classes. So, we will add those classes in Our components and the styles will be applied to the components.
+
+So, if you are done with copying and paste the code in your `src/app.css` file then we can now add the stylling classes so go to the `src/app.js` file and add the classes like this:
+
+```js
+.....
+function App() {
+  return (
+    <Router>
+      <div className="container dark"> {/* this class will center the the content horizontally*/}
+        <div className="app"> {/*this class will center the the content vertically and the content will be in the middle of the page*/}
+          <Header />
+          <Routes>
+            <Route path="/" element={<NotesListPage />} />
+            <Route path="/note/:id" element={<NotePage />} />
+          </Routes>
+        </div>
+      </div>
+    </Router>
+  );
+}
+.....
+```
+
+Now the content of the screen should be in the middle of the screen and with some additional styling.
+
+Now we can style the `NotesListPage` component. So, goto the `src/pages/NotesListPage.js` file and add the classes like this:
+
+```js
+.....
+const NotesListPage = () => {
+  return (
+    <div className="notes"> {/* this class will add some padding to the content*/}
+      <div className="notes-header"> {/* this class will style the header of the page*/}
+        <h2 className="notes-title">&#9782; Notes</h2> {/* this class will style the title of the page and the &#9782; is the unicode for a nice looking icon*/}
+        <p className="notes-count">{notes.length}</p> {/* this class will style the count of the notes*/}
+      </div>
+      <div className="notes-list"> {/* this class will style the list of the notes*/}
+        {notes.map((note) => {
+          return (
+            <div key={note.id}>
+              <ListItem note={note} />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+.....
+```
+
+Now you should see a `light green` syntax highlighted `Notes` title and a `light green` syntax highlighted `Notes` icon in the `NotesListPage` component and how many notes are there in the `notes` array.
+
+We should style the individual `ListItem` component. So, goto the `src/components/ListItem.js` file and add the classes like this:
+
+```js
+.....
+
+const ListItem = (note) => {
+  const { id, title, body, created, updated } = note.note;
+  console.log(id, title, body, created, updated);
+  return (
+    <div>
+      <Link to={`note/${id}`}>
+        <div className="notes-list-item"> {/* this class will style the list item*/}
+          {body}
+        </div>
+      </Link>
+    </div>
+  );
+};
+.....
+```
+
+Now this should look like a `list item` and if you click the item you should see the `NotePage` component with the specific note and this should look a lot cleaner than before and removed `updated` and `created` date from the `ListItem` component.
+
+Finally, we can style the `NotePage` component. So, goto the `src/pages/NotePage.js` file and add the classes like this:
+
+```js
+.....
+import { Link } from "react-router-dom"; //importing the Link component  to go back to the home page
+ 
+const NotePage = () => {
+  .....
+  return (
+    <div className="note"> {/* this class will style the note page*/}
+      <div className="note-header"> {/* this is for the title and going back icon*/}
+        <h3>
+          <Link to="/"> {/* this will take us to the home page*/}
+            {/* arrow left icon */}
+            &#8592;
+          </Link>
+        </h3>
+      </div>
+      <p>{note.body}</p>
+    </div>
+  );
+};
+.....
+```
+
+Now you should the note in the page and it should have a nice bask arroy icon to go back to the home page and the note itself. But there no way we can edit a `note` so we need to do some editing to the `NotePage` component to make it editable.
+
+```js
+.....
+const NotePage = () => {
+  .....
+    return (
+    <div className="note">
+      <div className="note-header">
+        <h3>
+          <Link to="/">
+            {/* arrow left icon */}
+            &#8592;
+          </Link>
+        </h3>
+      </div>
+
+      <textarea value={note.body}>
+        {/* this is the editable note body but will not work until we add the onChange handler */}
+      </textarea>
+
+    </div>
+  );
+};
+
+```
+
+> textarea is a html tag that is used to take input from the user. We will use this to edit the note. But this will not work until we add the onChange handler.
+
+This will make the note page a little cleaner and the `value={note.body}` will show the note in the textarea. But we need to add the `onChange` handler to make the textarea editable. We will fix it but we have another thing left.
+
+We haven't really stylled or edited the header tag for our website. So, goto the `src/components/Header.js` file and add the classes like this:
+
+```js
+.....
+
+const Header = () => {
+  return (
+    <div className="app-header"> {/* this will make the header sticky and will be on top of the page*/}
+      <h1>Notes List</h1>
+    </div>
+  );
+};
+.....
+
+```
+
+Now you should see the header on top of the page and it should be sticky.
+
+Now we have a good looking `React-Notes-App`. Evrything is not perfect but it's good enough for now. We will make some changes to the `NotePage` component later because we need a backend for that. So, the frontend part is done for now. we will comeback but lets setup the `Backend`.
 
 
-> Note: the `Route` component will render the `NotesListPage` component when the path is `/`. You can also use the `exact` prop to specify the exact path for the `NotesListPage` component.
+# Backend
+
+## Creating the Django Project
+
+So, opren your project directry in the terminal and type:
+
+```bash
+project$ python -m venv venv
+```
+
+> this will create a virtual environment named `venv` in the project directory.
+
+Now activate the virtual environment by typing:
+
+```bash
+project$ source venv/bin/activate
+or 
+project$ . venv/bin/activate # for windows
+```
+
+> this will activate the virtual environment. You will see a `(venv)` in the terminal.
+
+Now we need to install the `django` package in the virtual environment. To do that type:
+
+```bash
+(venv) project$ pip install django
+```
+
+> this will install the `django` package in the virtual environment.
+
+Now we need to create a django project. To do that type:
+
+```bash
+(venv) project$ django-admin startproject backend
+```
+
+> this will create a django project named `backend` in the project directory.
+
+Now if you look at the directory you should see something like this:
+
+```bash
+project
+├── backend
+│   ├── backend
+│   │   ├── asgi.py
+│   │   ├── __init__.py
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   └── wsgi.py
+│   └── manage.py
+├── frontend
+│   ├── node_modules
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── public
+│   ├── README.md
+│   ├── src
+│   │   ├── assets
+│   │   ├── components
+│   │   ├── pages
+│   │   ├── App.css
+│   │   ├── App.js
+│   │   └── index.js
+│   ├── package.json
+│   └── README.md
+└── venv
+```
+
+Now we need to create an app for the project. To do that type:
+
+```bash
+(venv) project$ cd backend
+
+(venv) project/backend$ python manage.py startapp notes
+```
+
+> this will create an app named `notes` in the `backend` project.
+
+Now if you look at the directory you should see something like this:
+
+```bash
+backend
+├── backend
+├── notes
+│   ├── admin.py
+│   ├── apps.py
+│   ├── __init__.py
+│   ├── migrations
+│   ├── models.py
+│   ├── tests.py
+│   └── views.py
+└── manage.py
+```
+
+Now we need to add the `notes` app to the `INSTALLED_APPS` list in the `backend/backend/settings.py` file. So, goto the `backend/backend/settings.py` file and add the `notes` app to the `INSTALLED_APPS` list like this:
+
+```python
+INSTALLED_APPS = [
+    'notes', # adding the notes app
+    'django.contrib.admin',
+    .....
+]
+```
+
+
+
 
 
