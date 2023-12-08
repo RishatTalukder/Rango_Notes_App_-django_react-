@@ -2188,18 +2188,40 @@ We were using 2 server for the porject. 1. the React server 2. the django server
 
 They were in `localhost:3000` and `localhost:8000` respectively and we were using the `proxy` to get the data from the `localhost:8000` server. But we want to do all that in a single server. So, we will use the `django` server to do all that. So, lets get started.
 
-# Steps
+If you remember the home page for the `django` server is not set, We will make the `react` the home page for the `django` server.
+
+## Steps
 
 1. Take the `whole Frontend` folder and Cut it and paste it inside the `backend` folder. 
 the foler structure should look like this:
 
 ```
-backend
-├───backend
-├───frontend
-├───notes
-├───manage.py
-└───db.sqlite3
+project folder
+    |
+    |__backend
+    |   |__notes
+    |   |__backend
+    |   |__frontend
+    |   |   |
+    |   |   |__public
+    |   |   |__src
+    |   |   |__package.json
+    |   |   |__package-lock.json
+    |   |   |__README.md
+    |   |   |__etc...
+    |   |__manage.py
+    |   |__db.sqlite3
+    |   |__etc...
+    |
+    |__etc...
 ```
 
+2. stop all servers.
+3. open the `backend/frontend` folder in terminal and type:
+  
+  ```bash
+  backend/frontend$ npm run build
+  ```
+  this will create a `build` folder in the `backend/frontend` folder. 
 
+4.
