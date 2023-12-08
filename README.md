@@ -2223,5 +2223,72 @@ project folder
   backend/frontend$ npm run build
   ```
   this will create a `build` folder in the `backend/frontend` folder. 
+  > build folder is the production build of the react app. it complies all the reatc code to raw javascript , html and css code. you can have a look at the `build` folder if you want to. There will be a lot of files in the `build` folder. But we don't need to worry about that. Just go to the `build/index.html` file and you will see the `html` code for the `react` app.
 
-4.
+4. now open the `backend/backend/settings.py` and edit the `templates` variable:
+  
+```python
+    
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            BASE_DIR / "frontend/build", # adding the frontend/build folder
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                .....
+            ],
+        },
+    },
+]
+
+```
+we added the `frontend/build` folder to the `DIRS` variable. This will tell the `django` server to look for the `index.html` file in the `frontend/build` folder.
+
+now `djnago` knows there are some `templates` in the `frontend/build` folder. 
+
+There is also some static files too so,
+
+5. goto the `backend/backend/settings.py` file and edit the `STATICFILES_DIRS` variable:
+
+```python
+STATICFILES_DIRS = [
+    BASE_DIR / "frontend/build/static", # adding the frontend/build/static folder
+]
+```
+
+we added the `frontend/build/static` folder to the `STATICFILES_DIRS` variable. This will tell the `django` server to look for the `static` folder in the `frontend/build` folder.
+
+6. now make a url for the react app. So, goto the `backend/backend/urls.py` file and type:
+
+```python
+from django.contrib import admin
+from django.urls import path, include
+from django.views.generic import TemplateView # importing the TemplateView
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/', include('notes.urls')),
+    path('', TemplateView.as_view(template_name='index.html')), # adding the url for the react app
+]
+```
+
+we added a new url that will render the `index.html` file from the `frontend/build` folder and also handle all the urls for the `react` app.
+
+But the issue is when we search for a specific url or hard reload the page we get a `404` error. This is because the `django` server is handling all the urls. So, we need to tell the `django` server to handle all the urls except the `react` app urls. So, goto the `backend/backend/urls.py` file and type:
+
+```python
+from django.contrib import admin
+from django.urls import path, include
+from django.views.generic import TemplateView
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/', include('notes.urls')),
+    path('', TemplateView.as_view(template_name='index.html')),
+]
+
+urlpatterns += [re_path(r'^.*', TemplateView.as_view(template_name='index.html'))] # adding the url for the react app
+```
