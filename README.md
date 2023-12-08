@@ -1138,7 +1138,7 @@ def getNotes(request):
 
 @api_view(['GET'])
 def getNote(request, pk): # pk is the primary key of the note
-    note = Note.objects.get(_id=pk) # getting the note from the database
+    note = Note.objects.get(id=pk) # getting the note from the database
     serializer = NoteSerializer(note, many=False) # serializing the note, many=False because we are serializing a single note
     return Response(serializer.data) # returning the serialized data
 ```
@@ -1180,18 +1180,24 @@ We need to connect the `frontend` to the `backend` to get the notes from the dat
 ```js
 
 .....
+// import notes from "../assets/data"; // we don't need this anymore
+import { useState, useEffect } from "react"; // importing the useState and useEffect hooks
 
 const NotesListPage = () => {
   const [notes, setNotes] = useState([]); // using the useState hook to set the notes
-
+  
+  // using the useEffect hook to get the notes from the database
   useEffect(() => {
-    const fetchNotes = async () => { // creating an async function to fetch the notes
-      const { data } = await axios.get("/api/notes/"); // getting the notes from the backend
-      setNotes(data); // setting the notes
-    };
-
-    fetchNotes(); // calling the fetchNotes function
+    getNotes();
   }, []);
+  
+  // getting the notes from the database
+  let getNotes = async () => {
+    let response = await fetch("http://127.0.0.1:8000/api/notes/"); // getting the notes from the database
+    let data = await response.json(); // converting the response to json
+    console.log(data); // logging the data
+    setNotes(data); // setting the notes
+  };
 
   return (
     <div className="notes">
@@ -1212,6 +1218,988 @@ const NotesListPage = () => {
   );
 };
 
+export default NotesListPage;
 
+```
+
+We are fetching the notes from the database and setting the notes in the `notes` state. We are using the `useState` and `useEffect` hooks to do that.
+
+Now if you goto the `localhost:3000` you should see an `error` in consol. This is because of `cross-origin`  error.
+
+> cross-origin error is a security feature of the browser. It prevents the browser from making request to another server. We are making request to the `localhost:8000` server from the `localhost:3000` server. So, we are getting this error.
+
+So, we need to fix this error in the server. So, we need another package for that. So, goto the terminal and type:
+
+```bash
+(venv) project/backend$ pip install django-cors-headers
+```
+
+> this will install the `django-cors-headers` package in the virtual environment.
+
+Now goto the `backend/backend/settings.py` file and find the `MIDDLEWARE` list and add the `CorsMiddleware` to the `MIDDLEWARE` list like this:
+
+```python
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', # adding the CorsMiddleware
+    'django.middleware.security.SecurityMiddleware',
+    .....
+]
+```
+
+also add `corsheaders` to the `INSTALLED_APPS` list like this:
+
+```python
+INSTALLED_APPS = [
+    'notes',
+    'rest_framework',
+    'corsheaders', # adding the corsheaders
+    'django.contrib.admin',
+    .....
+]
+```
+
+Now to give access to the data to the `frontend` add the following to the `backend/backend/settings.py` file:
+
+```python
+CORS_ORIGIN_ALLOW_ALL = True
+```
+
+this will give access to the data to the `frontend`. But this is not a good practice. But for this project we will use this. 
+
+Now goto the `localhost:3000` and you should see the notes in the `NotesListPage` component working.
+
+And our app in also working fine but we made a `json` response for individual notes. So, we need to make a `json` response for individual notes. So, goto the `src/pages/NotePage.js` file and type:
+
+```js
+.....
+// import notes from "../assets/data";
+import { useState, useEffect } from "react"; // importing the useState and useEffect hooks
+const NotePage = () => {
+  const { id } = useParams(); // using the useParams hook
+
+  const [note, setNote] = useState([]); // using the useState hook to set the note
+  const getNote = async () => { // getting the note from the database
+    let response = await fetch(`http://127.0.0.1:8000/api/notes/${id}/`); // getting the note from the database
+    let data = await response.json();
+    console.log(data);
+    setNote(data);
+  };
+
+  useEffect(() => {
+    getNote();
+  }, []);
+
+  // Find the note with a matching id
+  //const note = notes.find((note) => note.id === Number(id));
+
+  // Display a message if the note is not found
+  if (!note) {
+    return <p>Note not found</p>;
+  }
+
+  return (
+    ..... // the same code from before
+  );
+};
+
+export default NotePage;
+
+```
+
+It's almost the same as the `NotesListPage` component. But we are getting a single note from the database and setting the note in the `note` state. We are using the `useState` and `useEffect` hooks to do that.
+
+Now if you goto the `localhost:3000/note/1` you should see the note in the `NotePage` component working.
+
+## Proxy
+
+We are using `http://127.0.0.1:8000/` to get the data from the database. And we have to type this everytime we want to get the data from the database. It's because when ever the `fetch` function is called it makes a request to the `localhost:3000` server for the data but the data is in the `localhost:8000` server. So, we have to type the `localhost:8000` everytime we want to get the data from the database. It's annoying. There is a way to fix this. We can use `proxy` to fix this. So, goto the `frontend/package.json` file and add the following:
+
+```json
+{
+  "name": "frontend",
+  "proxy": "http://127.0.0.1:8000", // adding the proxy
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    .....
+  },
+.....
+}
+```
+> restart the react server to see the changes.
+Now we can use the path without specifying the `localhost:8000` everytime we want to get the data from the database. So, goto the `src/pages/NotesListPage.js` file and type:
+
+```js
+.....
+
+const getNotes = async () => {
+    let response = await fetch("/api/notes/"); // getting the notes from the database
+    let data = await response.json();
+    console.log(data);
+    setNotes(data);
+  };
+
+.....
+```
+
+we can also do the same for the `NotePage` component. So, goto the `src/pages/NotePage.js` file and type:
+
+```js
+.....
+
+const getNote = async () => {
+    let response = await fetch(`/api/notes/${id}/`); // getting the note from the database
+    let data = await response.json();
+    console.log(data);
+    setNote(data);
+  };
+
+.....
+```
+
+Now if you goto the `localhost:3000` and `localhost:3000/note/1` you should see the notes in the `NotesListPage` component and the note in the `NotePage` component working.
+
+# CRUD
+
+Now we have everything ready time for the fun part. We will make the `frontend` fully functional. We will make the `frontend` fully functional by adding the `CRUD` functionality to the `frontend`. So, lets get started.
+
+We will start with updating a note.
+
+## Updating a Note
+
+This is going to be fun. By fun I mean a lot of work. So, lets get started.
+
+### Getting updated note in rest framework
+
+We need to make an api to update a note. So, goto the `backend/notes/views.py` file and type:
+
+```python
+from django.shortcuts import render
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+from .models import Note
+from .serializers import NoteSerializer
+
+@api_view(['GET'])
+def getRoutes(request):
+    .....
+
+@api_view(['GET'])
+def getNotes(request):
+    .....
+
+@api_view(['GET'])
+def getNote(request, pk):
+    .....
+
+@api_view(['PUT']) # adding the PUT method
+def updateNote(request, pk): # pk is the primary key of the note
+    data = request.data # getting the data from the request
+    note = Note.objects.get(id=pk) # getting the note from the database
+    serializer = NoteSerializer(instance=note, data=data) # serializing the note
+
+    if serializer.is_valid(): # checking if the data is valid
+        serializer.save() # saving the data in the database
+    
+    return Response(serializer.data) # returning the serialized data
+```
+
+- we added a new function named `updateNote` that takes a `pk` parameter. pk is the primary key of the note or the id of the note.
+
+- `data= request.data` is used to get the data from the request. 
+- `note = Note.objects.get(id=pk)` is used to get the note from the database.
+- `serializer = NoteSerializer(instance=note, data=data)` is used to serialize the note. We used `instance=note` because we are updating the note. If we were creating a new note we would use `NoteSerializer(data=data)`. 
+- `if serializer.is_valid():` is used to check if the data is valid.
+- `serializer.save()` is used to save the data in the database.
+- `return Response(serializer.data)` is used to return the serialized data.
+
+Thats what Happend here. If You noticed we added a new method named `PUT` in the `@api_view` decorator. This is because we are updating the note. If we were creating a new note we would use `POST` method. We will use `PUT` method for updating the note and `POST` method for creating a new note.
+
+Now we need to make a route for the `updateNote` function. So, goto the `backend/notes/urls.py` file and type:
+
+```python
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    path("", views.getRoutes, name="geturls"),
+    path("notes/", views.getNotes, name="getnotes"),
+    path("notes/<str:pk>/", views.getNote, name="getnote"),
+    path("notes/<str:pk>/update/", views.updateNote, name="updatenote"), # adding the route for the updateNote function
+]
+
+```
+
+Now goto the `localhost:8000/api/notes/1/update/` and you should see something different. The `rest_framework` page has a form to update the note. But we don't need that. We need to update the note from the `frontend`. So, we need to make a `json` response for the `updateNote` function.
+
+### Sending updated note in the frontend
+
+If you remember we made a `textarea` in the `NotePage` component. But we didn't add the `onChange` handler to make the `textarea` editable. So, goto the `src/pages/NotePage.js` file and type:
+
+```js
+.....
+const NotePage = () => {
+  ..... // the same code from before
+  if (!note) {
+    return <p>Note not found</p>;
+  }
+
+  return (
+    <div className="note">
+      <div className="note-header">
+        <h3>
+          <Link to="/">
+            {/* arrow left icon */}
+            &#8592;
+          </Link>
+        </h3>
+      </div>
+
+      <textarea onChange={(e) => setNote({...note, body: e.target.value})}
+       value={note.body}> {/* adding the onChange handler */}
+        {/* this is the editable note body but will not work until we add the onChange handler */}
+      </textarea>
+    </div>
+  );
+};
+
+export default NotePage;
+```
+
+I just added a `onChange` handler to the `textarea`. This will make the `textarea` editable and in the `onChange` handler we are setting the `note` state to the new note byt using the `setNote` function. We are using the `spread operator` to do that. We are also using the `e.target.value` to get the value of the `textarea` then we are setting the `note` state to the new note.
+
+Now if you goto the `localhost:3000/note/1` you should see the `textarea` editable. But if you type something in the `textarea` and refresh the page you will see that the note is not updated. This is because we didn't send the updated note to the database. But you can now type inside the `textarea` and the note will be updated in the `frontend`.
+
+Now what we want is to send a `PUT` request to the `backend` When we are done typing in the `textarea`. 
+
+### Sending the updated note to the backend
+
+We will use the `fetch` function to send the `PUT` request to the `backend`. So, goto the `src/pages/NotePage.js` file and type:
+
+```js
+
+.....
+import React from "react";
+import { useParams } from "react-router-dom";
+// import notes from "../assets/data";
+import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+const NotePage = () => {
+  ..... // the same code from before
+
+  // updating the note in the database 
+  let updateNote = async () => {
+    await fetch(`/api/notes/${id}/update/`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(note),
+    });
+  };
+
+  if (!note) {
+    return <p>Note not found</p>;
+  }
+
+  return (
+    ..... // the same code from before
+};
+
+export default NotePage;
+  
+```
+
+- we added a new function named `updateNote` that sends a `PUT` request to the `backend` to update the note.
+- we used the `fetch` function to send the `PUT` request to the `backend`.
+- we used the `PUT` method to send the `PUT` request to the `backend`.
+- we used the `Content-Type` header to specify the type of the data we are sending to the `backend`.
+- we used the `JSON.stringify` function to convert the `note` state to `json` string.
+- we used the `note` state as the `body` of the `PUT` request.
+
+I made a function to do the update but we need to call the function when we are done typing in the `textarea`. Now when do we call this? We can add a new button that will update the note when we click on it, we can also update the note when we click on the back button. 
+
+I like the second option. You try the first option. I will do the second option. So, goto the `src/pages/NotePage.js` file and type:
+
+```js
+.....
+import { useParams,useNavigate } from "react-router-dom"; // using the useNavigate hook from react-router-dom
+// import notes from "../assets/data";
+
+const NotePage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate(); // using the useNavigate hook to redirect to the home page
+
+  ..... // the same code from before
+
+  let handleSubmit = () =>{
+    updateNote(); // calling the updateNote function
+    navigate("/"); // redirecting to the home page
+  }
+
+  if (!note) {
+    return <p>Note not found</p>;
+  }
+
+  return (
+    <div className="note">
+      <div className="note-header">
+        <h3>
+          <div onClick={handleSubmit} > {/* adding the onClick handler and removing the Link */}
+            {/* arrow left icon */}
+            &#8592;
+          </div>
+        </h3>
+      </div>
+
+      <textarea
+        onChange={(e) => setNote({ ...note, body: e.target.value })}
+        value={note.body}
+      >
+        {/* this is the editable note body but will not work until we add the onChange handler */}
+      </textarea>
+    </div>
+  );
+};
+
+export default NotePage;
+
+```
+
+Now this can be messy to unserstand. So, here's what happened here:
+
+- I made a new function named `handleSubmit` that calls the `updateNote` function and redirects to the home page. 
+
+- I wanted to update the note when we click on the back button. So, I removed the `Link` component and added a `div` with the `onClick` handler so that when we click on the back button the `handleSubmit` function will be called and the note will be updated.
+
+- Inside the `handleSubmit` function we are calling the `updateNote` function and redirecting to the home page.
+
+SO now if you goto the `localhost:3000/note/1` and type something in the `textarea` and click on the back button you should see the note updated in the `frontend` and the `backend`. This is because we are sending a `PUT` request to the `backend` and updating the note in the `backend` as well.
+
+Now just a simple thing I want to add. I want to add the feature when you update a note the `updated` note is shown at the top of the `NotesListPage` component. So, this is just a small thing. we can add this in the `backend`. So, goto the `backend/notes/views.py` file and type:
+
+```python
+.....
+@api_view(['GET'])
+def getNotes(request):
+    notes = Note.objects.all().order_by('-updated') # getting all the notes from the database and ordering them by the updated field
+    serializer = NoteSerializer(notes, many=True)
+    return Response(serializer.data)
+.....
+
+```
+
+Now if you goto the `localhost:3000` and update a note you should see the updated note at the top of the `NotesListPage` component.
+
+That was prety confusing But still have a lot of more fun stuff to do.(by fun I mean excruciatingly painful).
+
+## Deleting a Note
+
+This is the easy one Of the `CRUD` functionality. 
+
+Goto the `backend/notes/views.py` file and type:
+
+```python
+..... # the same code from before
+
+@api_view(['DELETE']) # adding the DELETE method
+def deleteNote(request, pk): # pk is the primary key of the note
+    note = Note.objects.get(id=pk) # getting the note from the database
+    note.delete() # deleting the note
+    return Response('Note was deleted') # returning a message
+```
+
+- we added a new function named `deleteNote` that takes a `pk` parameter. pk is the primary key of the note or the id of the note.
+
+- `note = Note.objects.get(id=pk)` is used to get the note from the database.
+- `note.delete()` is used to delete the note from the database.
+- `return Response('Note was deleted')` is used to return a message.
+
+Thats what Happend here. If You noticed we added a new method named `DELETE` in the `@api_view` decorator. This is because we are deleting the note. If we were creating a new note we would use `POST` method. We will use `DELETE` method for deleting the note and `POST` method for creating a new note.
+
+Now we need to make a route for the `deleteNote` function. So, goto the `backend/notes/urls.py` file and type:
+
+```python
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    path("", views.getRoutes, name="geturls"),
+    path("notes/", views.getNotes, name="getnotes"),
+    path("notes/<str:pk>/", views.getNote, name="getnote"),
+    path("notes/<str:pk>/update/", views.updateNote, name="updatenote"),
+    path("notes/<str:pk>/delete/", views.deleteNote, name="deletenote"), # adding the route for the deleteNote function
+]
+
+```
+
+Now don't goto the `localhost:8000/api/notes/1/delete/` because it will delete the first note in the database. We need to make a `json` response for the `deleteNote` function.
+
+### Deleting a Note in the frontend
+
+We will use the `fetch` function to send the `DELETE` request to the `backend`. So, goto the `src/pages/NotePage.js` file and type:
+
+```js
+.....
+const NotePage = () => {
+  .....
+
+  const deleteNote = async () => {
+    await fetch(`/api/notes/${id}/delete/`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    navigate("/");
+  };
+
+  .....
+
+  return (
+    .....
+};
+
+export default NotePage;
+
+```
+
+- `deleteNote` is a new function that sends a `DELETE` request to the `backend` to delete the note. Its almost the same as the `updateNote` function and as the `updateNote` function we are using the `fetch` function to send the `DELETE` request to the `backend`.
+
+- we used the `DELETE` method to send the `DELETE` request to the `backend`.
+
+
+Now we need to call the `deleteNote` function when we click on the delete button. So, goto the `src/pages/NotePage.js` file and type:
+
+```js
+..... // the same code from before
+const NotePage = () => {
+  ..... // the same code from before
+
+  const deleteNote = async () => {
+    await fetch(`/api/notes/${id}/delete/`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    navigate("/");
+  };
+
+  ..... // the same code from before
+  return (
+    <div className="note">
+      <div className="note-header">
+        <h3>
+          <div onClick={handleSubmit}>
+            {/* arrow left icon */}
+            &#8592;
+          </div>
+        </h3>
+
+
+
+        <button onClick={deleteNote}> {/* adding the onClick handler */}
+          {/* trash icon */}
+          &#128465;
+        <button onClick={deleteNote}>
+          {/* trash icon */}
+          &#128465;
+        </button>
+      </div>
+
+
+
+
+      <textarea
+        onChange={(e) => setNote({ ...note, body: e.target.value })}
+        value={note.body}
+      >
+        {/* this is the editable note body but will not work until we add the onChange handler */}
+      </textarea>
+    </div>
+  );
+};
+
+export default NotePage;
+
+```
+
+We can just add a `button` and add the `onClick` handler to the `button` and call the `deleteNote` function when we click on the `button`. But I like the trash icon. So, I added a `button` and added the `onClick` handler to the `button` and called the `deleteNote` function when we click on the `button`. This will delete the note from the `frontend` and the `backend`.
+
+And thats it For deleting a note. Now if you goto the `localhost:3000/note/1` and click on the trash icon you should see the note deleted from the `frontend` and the `backend`.
+
+Now for the hard part. Creating a new note.
+
+## Creating a New Note
+
+### new note Button
+It's the same logic as the `deleteNote` function But we will make another `component` only for creating a new note.
+
+So, goto `src/components` folder and make a new file named `addNote.js` and type:
+
+```js
+import React from "react";
+import { Link } from "react-router-dom";
+
+const AddNote = () => {
+  return (
+    <div>
+      <Link to="/note/new" className="floating-button">
+        <div>
+          <div>
+            {/* plus icon */}
+            <strong>
+                &#43;
+            </strong>
+          </div>
+        </div>
+      </Link>
+    </div>
+  );
+};
+
+export default AddNote;
+
+```
+
+This is just a `Link` component that will redirect to the `NotePage` component when we click on the `Link` component. But we need to make a new route for the `NotePage` component. So, goto the `src/NotesListPage.js` file and type:
+
+```js
+.....
+import { useState, useEffect } from "react";
+import ListItem from "../components/ListItem";
+import AddNote from "../components/AddNote"; // importing the AddNote component
+
+
+  return (
+    <div className="notes">
+      <div className="notes-header">
+        <h2 className="notes-title">&#9782; Notes</h2>
+        <p className="notes-count">{notes.length}</p>
+      </div>
+      <div className="notes-list">
+        {notes.map((note) => {
+          return (
+            <div key={note.id}>
+              <ListItem note={note} />
+            </div>
+          );
+        })}
+      </div>
+      <AddNote /> {/* adding the AddNote component */}
+    </div>
+  );
+};
+
+export default NotesListPage;
+
+```
+
+Now if you click on the plus icon you should see the `NotePage` component with a trash icon. Which does not make any sense. So, To fix that we need to add a condition where if the `id` is `new` then we will show the `NotePage` component without the trash icon. So, goto the `src/pages/NotePage.js` file and type:
+
+```js
+.....
+  return (
+    <div className="note">
+      <div className="note-header">
+        <h3>
+          <div onClick={handleSubmit}>
+            {/* arrow left icon */}
+            &#8592;
+          </div>
+        </h3>
+
+
+        {/* if the id is not equal to new, then show the delete button */}
+        {id !== "new" ? (
+          <button onClick={deleteNote}>
+            {/* trash icon */}
+            &#128465;
+          </button>
+        ) : (
+          <button>done</button>
+        )}
+      </div>
+
+      .....
+    </div>
+  );
+};
+
+export default NotePage;
+
+```
+
+Now if you goto the `localhost:3000/note/new` you should see the `NotePage` component without the trash icon. But if you goto the `localhost:3000/note/1` you should see the `NotePage` component with the trash icon.
+
+
+### Fixing the routing issue
+If you look at the console you should see an error. This is because we are trying to get a note with the `id` of `new` from the database. But we don't have a note with the `id` of `new` in the database. It's because the `useEffect` hook is running when the component is mounted. So, we need to add a condition where if the `id` is not equal to `new` then we will run the `useEffect` hook. So, goto the `src/pages/NotePage.js` file and type:
+
+```js
+import React from "react";
+import { useParams, useNavigate } from "react-router-dom";
+// import notes from "../assets/data";
+import { useState, useEffect } from "react";
+const NotePage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const [note, setNote] = useState([]);
+
+  const getNote = async () => {
+    if (id === "new") return; // if the id is equal to new then return
+
+    let response = await fetch(`/api/notes/${id}/`);
+    let data = await response.json();
+    console.log(data);
+    setNote(data);
+  };
+
+  .....
+
+    return (
+      .....
+    );
+  };
+
+export default NotePage;
+  
+```
+
+As the `useEffect` hook is running the getNote function when the component is mounted. So, we added a condition where if the `id` is equal to `new` then we will return. This will fix the error.
+
+Now time to create a new note. 
+
+### Marging Update and Delete Note
+Creating a new Note is as same as `updating` a note. But before doing that want some extra features like when we are edting a existing note If the note is empty then the note will be deleted. we can do that by adding some conditions in the `handleSubmit` function. So, goto the `src/pages/NotePage.js` file and type:
+
+```js
+
+.....
+
+const NotePage = () => {
+  .....
+
+  let handleSubmit = () => {
+
+    if (id !== "new" && note.body === "") {
+      deleteNote();
+    }
+    else if (id !== "new") {
+      updateNote();
+    }
+    navigate("/");
+  };
+
+  .....
+
+  return (
+    .....
+  );
+};
+
+export default NotePage;
+
+```
+
+SO, when the `id` is not equal to `new` and the `note.body` is empty then we will delete the note. 
+
+When the `id` is not equal to `new` and the `note.body` is not empty then we will update the note.
+
+### New note in backend
+
+Now lets make a rest api for creating a new note. So, goto the `backend/notes/views.py` file and type:
+
+```python
+.....
+@api_view(['POST']) # adding the POST method
+def createNote(request): 
+    data = request.data # getting the data from the request
+    note = Note.objects.create( # creating a new note
+        body=data['body'] # adding the body field
+    )
+    serializer = NoteSerializer(note, many=False) # serializing the note
+    return Response(serializer.data) # returning the serialized data
+```
+
+Using the `POST` method to create a new note. We are getting the data from the request. We are creating a new note and serializing the note. We are returning the serialized data.
+
+Then using `create` method to create a new note. We are adding the `body` field to the note. We are serializing the note. We are returning the serialized data.
+
+Now we need to make a route for the `createNote` function. So, goto the `backend/notes/urls.py` file and type:
+
+```python
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    path("", views.getRoutes, name="geturls"),
+    path("notes/", views.getNotes, name="getnotes"),
+    path("notes/create/", views.createNote, name="createnote"), # adding the route for the createNote function
+    path("notes/<str:pk>/", views.getNote, name="getnote"),
+    path("notes/<str:pk>/update/", views.updateNote, name="updatenote"),
+    path("notes/<str:pk>/delete/", views.deleteNote, name="deletenote"),
+    
+]
+
+```
+
+> the position of the url path is important. If you put the `createNote` path after the `getNote` path then the `createNote` path will be treated as the `getNote` path and you will be asked to give a `pk` parameter to avoid this issue put the `createNote` path before the `getNote` path.
+
+
+### New note in frontend
+
+Now lets make a function to create a new note. So, goto the `src/pages/NotePage.js` file and type:
+
+```js
+.....
+
+const NotePage = () => {
+  .....
+
+  const createNote = async () => {
+    await fetch(`/api/notes/create/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(note),
+    });
+  };
+
+  .....
+
+  return (
+    .....
+  );
+};
+
+export default NotePage;
+
+```
+
+Now lets handle the submissions. So, goto the `src/pages/NotePage.js` file and type:
+
+```js
+.....
+
+const NotePage = () => {
+  .....
+
+  let handleSubmit = () => {
+    if (id !== "new" && note.body === "") {
+      deleteNote();
+    } else if (id !== "new") {
+      updateNote();
+    } else if (id === "new" && note.body !== "") {
+      createNote();
+    }
+    navigate("/");
+  };
+
+  .....
+
+  return (
+    .....
+  );
+};
+
+export default NotePage;
+
+```
+
+We also have unfinished business. We need to redirect to the home page when we click on the done button. So, goto the `src/pages/NotePage.js` file and type:
+
+```js
+.....
+
+const NotePage = () => {
+  .....
+
+  let handleSubmit = () => {
+    .....
+  }
+
+  return (
+    .....
+    <div className="note">
+      ...... // the same code from before
+
+        {id !== "new" ? (
+          <button onClick={deleteNote}>
+            {/* trash icon */}
+            &#128465;
+          </button>
+        ) : (
+          <button onClick={handleSubmit}>done</button> {/* adding the onClick handler */}
+        )}
+      </div>
+
+      <textarea
+        onChange={(e) => setNote({ ...note, body: e.target.value })}
+        value={note.body}
+      >
+        {/* this is the editable note body but will not work until we add the onChange handler */}
+      </textarea>
+
+    </div>
+  );
+};
+
+export default NotePage;
+
+```
+
+# Extra Credit
+
+## Title Generator
+Now that we got all thi sout of the way You should be able to create a new note. Click the plus icon and you should see the `NotePage` component with a done button. Click on the done button and you should see the note created in the `frontend` and the `backend` and you will be redirected to the home page and you should see the note at the top of the `NotesListPage` component.
+
+Now to troubleshoot and fix the issue with the titles of the notes in the `NoteslistPage`. SO, if you make a new note with this data 
+
+<p>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quibusdam. wedwedwe iofsjnksdfhbbbnxcnmbnmgdsriopasodoq qwerhsjkhdb sdfskla iksroiufsoierfsoiefhs s edfsiehfgbskdjhfgaknsbfa uagwhreu hawoeea wsd aw o qawiueaoiwhda wehaosdihsdkjfsb dfef oisy hefsef sef soieyhfoseuhfaowehrdakjsdaklmsdf ioer fhosae hseo ifhsoeihf  e oif hseofihsefoiuhse ggsdffsjkhdf qaklwjhd oESIHUfdoqwpqrwsiekfj wo w </p>
+
+you will see all of this is in the `NotesListPage` page which is not ideal for any notes app. We need a title generator to fix this. So, goto the `frontend/src/ListItem.js` file and type:
+
+```js
+import React from "react";
+import { Link } from "react-router-dom";
+
+const ListItem = (note) => {
+  const { id, body, updated } = note.note;
+let getUpdateTime = () => {
+    let date = new Date(updated);
+    return 
+  let title = body.split("\n")[0]; // getting the first line of the note
+
+  if (title.length > 45){
+    title = title.slice(0, 45); // getting the first 45 characters of the first line of the note
+  }
+
+  return (
+    <div>
+      <Link to={`note/${id}`}>
+        <div className="notes-list-item">
+          <h3>{title}</h3>
+        </div>
+      </Link>
+    </div>
+  );
+};
+
+export default ListItem;
+
+```
+
+- we added a new variable named `title` that gets the first line of the note.
+- we added a condition where if the `title` is greater than `45` characters then we will get the first `45` characters of the `title`.
+
+Now if you goto the `localhost:3000` and create a new note with the data above you should see the first `45` characters of the first line of the note in the `NotesListPage` component.
+
+## Update Time
+
+Lets add The update time For `extra` credit. So, goto the `frontend/src/ListItem.js` file and type:
+
+```js
+import React from "react";
+import { Link } from "react-router-dom";
+
+const ListItem = (note) => {
+  const { id, body, updated } = note.note;
+
+  let title = body.split("\n")[0];
+
+  if (title.length > 45) {
+    title = title.slice(0, 45);
+  }
+
+  return (
+    <div>
+      <Link to={`note/${id}`}>
+        <div className="notes-list-item">
+          <h3>{title}</h3>
+          <p>
+            <span>{updated}</span>
+          </p>
+        </div>
+      </Link>
+    </div>
+  );
+};
+
+export default ListItem;
+
+```
+
+Thi swill look bad. We need some stylling in the `uopdate time`. So, goto the `frontend/src/ListItem.js` file and type:
+
+```js
+import React from "react";
+import { Link } from "react-router-dom";
+
+const ListItem = (note) => {
+  const { id, body, updated } = note.note;
+
+  let title = body.split("\n")[0];
+
+  if (title.length > 45) {
+    title = title.slice(0, 45);
+  }
+
+  let getTime = () => {
+    let time = new Date(updated); // getting the date from the updated field
+    return time.toLocaleDateString() + " " + time.toLocaleTimeString(); // getting the date and time
+  }
+
+  return (
+    <div>
+      <Link to={`note/${id}`}>
+        <div className="notes-list-item">
+          <h3>{title}</h3>
+          <p>
+            <span>{getTime()}</span> {/* adding the getTime function */}
+          </p>
+        </div>
+      </Link>
+    </div>
+  );
+
+};
+
+export default ListItem;
+
+```
+
+- we added a new function named `getTime` that gets the date and time from the `updated` field.
+
+Now if you goto the `localhost:3000` and create a new note you should see the date and time in the `NotesListPage` component.
+
+and we are done With this `REACT + DJANGO` project now time to FULLY CONNNECT THE `REACT` APP WITH THE `DJANGO` APP.
+
+# Connecting the React App with the Django App
+
+We were using 2 server for the porject. 1. the React server 2. the django server. 
+
+They were in `localhost:3000` and `localhost:8000` respectively and we were using the `proxy` to get the data from the `localhost:8000` server. But we want to do all that in a single server. So, we will use the `django` server to do all that. So, lets get started.
+
+# Steps
+
+1. Take the `whole Frontend` folder and Cut it and paste it inside the `backend` folder. 
+the foler structure should look like this:
+
+```
+backend
+├───backend
+├───frontend
+├───notes
+├───manage.py
+└───db.sqlite3
+```
 
 

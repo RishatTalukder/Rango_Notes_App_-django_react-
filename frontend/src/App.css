@@ -15,11 +15,11 @@
 }
 
 .dark {
-  --color-main: #f3f657;
+  --color-main: #e5eb38;
   --color-text: #d6d1d1;
   --color-dark: #f5f6f7;
   --color-gray: #999;
-  --color-bg: #1f2124;
+  --color-bg: #05182b;
   --color-lighter: #292a2c;
   --color-white: #2e3235;
   --color-border:#252629;
@@ -175,7 +175,7 @@ a {
   position: absolute;
   bottom: 24px;
   right: 16px;
-  background: var(--color-main);
+  background: #383a3f;
   border: none;
   width: 60px;
   height: 60px;
