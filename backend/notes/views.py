@@ -8,50 +8,16 @@ from rest_framework.response import Response
 from .models import Note
 from .serializers import NoteSerializer
 
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from rest_framework.permissions import AllowAny
 from rest_framework.authentication import BasicAuthentication
 
 # Create your views here.
 
-
-@api_view(["POST"])
-@authentication_classes([BasicAuthentication])
-@permission_classes([AllowAny])
-def getRoutes(request):
-    routes = [
-        {
-            "Endpoint": "/notes/",
-            "method": "GET",
-            "body": None,
-            "description": "Returns an array of notes",
-        },
-        {
-            "Endpoint": "/notes/id",
-            "method": "GET",
-            "body": None,
-            "description": "Returns a single note object",
-        },
-        {
-            "Endpoint": "/notes/create/",
-            "method": "POST",
-            "body": {"body": ""},
-            "description": "Creates new note with data sent in post request",
-        },
-        {
-            "Endpoint": "/notes/id/update/",
-            "method": "PUT",
-            "body": {"body": ""},
-            "description": "Creates an existing note with data sent in post request",
-        },
-        {
-            "Endpoint": "/notes/id/delete/",
-            "method": "DELETE",
-            "body": None,
-            "description": "Deletes and exiting note",
-        },
-    ]
-    return Response(routes)
 
 @api_view(["GET"])
 def getNotes(request):
@@ -90,8 +56,6 @@ def deleteNote(request, pk):
     note = Note.objects.get(id=pk)
     note.delete()
     return Response("Note was deleted")
-
-
 
 
 @api_view(["POST"])

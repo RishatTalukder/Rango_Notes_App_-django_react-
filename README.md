@@ -1,16 +1,50 @@
 <h1 align='center'> Notes app </h1>
 <h4 align='center'> A simple notes app with DJANGO + REACT JS </h4>
 
+![Notes App](./Screenshot%20from%202023-12-08%2022-04-20.png)
+
 ## Introduction
 
 i've been wanting to make a Simple project for beginners to have grasp of how good django and react js are when combined together. So i made this simple notes app. I hope you like it.
 
-This project will have 4 parts:
+<!-- TOC -->
 
-- Implementing the Frontend with React JS
-- Implementing the Backend with Django
-- Connecting the Frontend with the Backend
-- Deploying the project
+- [Frontend](#frontend)
+    - [Creating the React App](#creating-the-react-app)
+    - [Creating the Components](#creating-the-components)
+- [React Routing](#react-routing)
+- [Styling the project](#styling-the-project)
+- [Backend](#backend)
+    - [Creating the Django Project](#creating-the-django-project)
+    - [Using the Django Rest Framework](#using-the-django-rest-framework)
+- [Creating the Database](#creating-the-database)
+    - [Creating the Model](#creating-the-model)
+    - [Serializing the Data](#serializing-the-data)
+    - [api for a single note](#api-for-a-single-note)
+- [Connecting the Frontend to the Backend](#connecting-the-frontend-to-the-backend)
+    - [Connecting the Home Page](#connecting-the-home-page)
+    - [Proxy](#proxy)
+- [CRUD](#crud)
+    - [Updating a Note](#updating-a-note)
+        - [Getting updated note in rest framework](#getting-updated-note-in-rest-framework)
+        - [Sending updated note in the frontend](#sending-updated-note-in-the-frontend)
+        - [Sending the updated note to the backend](#sending-the-updated-note-to-the-backend)
+    - [Deleting a Note](#deleting-a-note)
+        - [Deleting a Note in the frontend](#deleting-a-note-in-the-frontend)
+    - [Creating a New Note](#creating-a-new-note)
+        - [new note Button](#new-note-button)
+        - [Fixing the routing issue](#fixing-the-routing-issue)
+        - [Marging Update and Delete Note](#marging-update-and-delete-note)
+        - [New note in backend](#new-note-in-backend)
+        - [New note in frontend](#new-note-in-frontend)
+- [Extra Credit](#extra-credit)
+    - [Title Generator](#title-generator)
+    - [Update Time](#update-time)
+- [Connecting the React App with the Django App](#connecting-the-react-app-with-the-django-app)
+    - [Steps](#steps)
+- [THE END](#the-end)
+
+<!-- /TOC -->
 
 ## Requirements
 
@@ -609,7 +643,7 @@ Finally, we can style the `NotePage` component. So, goto the `src/pages/NotePage
 ```js
 .....
 import { Link } from "react-router-dom"; //importing the Link component  to go back to the home page
- 
+
 const NotePage = () => {
   .....
   return (
@@ -680,7 +714,6 @@ Now you should see the header on top of the page and it should be sticky.
 
 Now we have a good looking `React-Notes-App`. Evrything is not perfect but it's good enough for now. We will make some changes to the `NotePage` component later because we need a backend for that. So, the frontend part is done for now. we will comeback but lets setup the `Backend`.
 
-
 # Backend
 
 ## Creating the Django Project
@@ -697,7 +730,7 @@ Now activate the virtual environment by typing:
 
 ```bash
 project$ source venv/bin/activate
-or 
+or
 project$ . venv/bin/activate # for windows
 ```
 
@@ -811,6 +844,7 @@ urlpatterns = [
     path('', views.getRoutes),
 ]
 ```
+
 > this should be the same typed here. I fyou din't type it correctly then you will get an error.
 
 Now we need to add connect this `notes/urls.py` file to the `backend/backend/urls.py` file. So, goto the `backend/backend/urls.py` file and type:
@@ -931,10 +965,9 @@ def getRoutes(request):
 
 ```
 
-Now goto the `localhost:8000/api/` and you should see the `json` response in a more readable way with default `rest_framework` styling. 
+Now goto the `localhost:8000/api/` and you should see the `json` response in a more readable way with default `rest_framework` styling.
 
 > the decorator `@api_view(['GET'])` is used to specify the method of the request. We will use this decorator for all the routes. But this was to show you how we can use the `rest_framework` package to make the `json` response more readable.
-
 
 Now that we know how to make a good json response lets make the database for the project.
 
@@ -953,9 +986,10 @@ DATABASES = {
 
 This is the default setup and we will use this for the meantime. But if you want make it more challenging you can use `postgresql` or `mysql` database. But for now we will use the default `sqlite3` database.
 
-If you don't know `sqlite3` is a `no-sql` database. So, we don't need to create a table for the database. We can just create a model and the database will create the table for us. 
+If you don't know `sqlite3` is a `no-sql` database. So, we don't need to create a table for the database. We can just create a model and the database will create the table for us.
 
 ## Creating the Model
+
 Go to the `backend/notes/models.py` file and type:
 
 ```python
@@ -993,6 +1027,7 @@ Now we need to migrate the model to the database. To do that type:
 ```bash
 (venv) project/backend$ python manage.py migrate
 ```
+
 > now the table for the model is created in the database. You can check it in the `backend/db.sqlite3` file. Other builtin django tables are also there.
 
 Now we need to register the model in the admin panel. So, goto the `backend/notes/admin.py` file and type:
@@ -1014,6 +1049,7 @@ You can make yourself the superuser by typing:
 ```
 
 This will ask for the following:
+
 - username (required but you can leave it blank, it will take your pc username)
 - email (optional)
 - password (required, you should use a strong password but if you want to test the project you can use `123456`)
@@ -1049,7 +1085,7 @@ Now goto the `localhost:8000/api/notes/` and you should see the notes as `json` 
 
 ## Serializing the Data
 
-To make a `json` response from `models` we need to `serialize` the data. 
+To make a `json` response from `models` we need to `serialize` the data.
 
 > serialization is the process of converting an object into a stream of bytes to store the object or transmit it to memory, a database, or a file. Its main purpose is to save the state of an object in order to be able to recreate it when needed. The reverse process is called deserialization.
 
@@ -1090,12 +1126,13 @@ def getNotes(request):
 ```
 
 SO, here's what happened here:
+
 - we imported the `NoteSerializer` from the `serializers.py` file.
 - we fetched the notes from the database.
 - we passed the notes to the `NoteSerializer` and serialized the notes, specified `many=True` because we are serializing multiple notes.
 - we returned the serialized data as `json` response by passing the `serializer.data` to the `Response` function.
 
->serializer.data is the serialized data.
+> serializer.data is the serialized data.
 
 Now make a route in the `backend/notes/urls.py` file for the `getNotes` function. So, goto the `backend/notes/urls.py` file and type:
 
@@ -1116,7 +1153,7 @@ Now goto the `localhost:8000/api/notes/` and you should see the notes as `json` 
 
 ## api for a single note
 
-Its the same as the `getNotes` function. 
+Its the same as the `getNotes` function.
 
 we need to make an api for a single note. So, goto the `backend/notes/views.py` file and type:
 
@@ -1168,7 +1205,6 @@ urlpatterns = [
 
 Now goto the `localhost:8000/api/notes/1/` and you should see the specific note as `json` response.
 
-
 Well we made the dummy notes. We should connect the `frontend` to the `backend` and get the notes from the database.
 
 # Connecting the Frontend to the Backend
@@ -1185,12 +1221,12 @@ import { useState, useEffect } from "react"; // importing the useState and useEf
 
 const NotesListPage = () => {
   const [notes, setNotes] = useState([]); // using the useState hook to set the notes
-  
+
   // using the useEffect hook to get the notes from the database
   useEffect(() => {
     getNotes();
   }, []);
-  
+
   // getting the notes from the database
   let getNotes = async () => {
     let response = await fetch("http://127.0.0.1:8000/api/notes/"); // getting the notes from the database
@@ -1224,7 +1260,7 @@ export default NotesListPage;
 
 We are fetching the notes from the database and setting the notes in the `notes` state. We are using the `useState` and `useEffect` hooks to do that.
 
-Now if you goto the `localhost:3000` you should see an `error` in consol. This is because of `cross-origin`  error.
+Now if you goto the `localhost:3000` you should see an `error` in consol. This is because of `cross-origin` error.
 
 > cross-origin error is a security feature of the browser. It prevents the browser from making request to another server. We are making request to the `localhost:8000` server from the `localhost:3000` server. So, we are getting this error.
 
@@ -1264,7 +1300,7 @@ Now to give access to the data to the `frontend` add the following to the `backe
 CORS_ORIGIN_ALLOW_ALL = True
 ```
 
-this will give access to the data to the `frontend`. But this is not a good practice. But for this project we will use this. 
+this will give access to the data to the `frontend`. But this is not a good practice. But for this project we will use this.
 
 Now goto the `localhost:3000` and you should see the notes in the `NotesListPage` component working.
 
@@ -1326,8 +1362,9 @@ We are using `http://127.0.0.1:8000/` to get the data from the database. And we 
 .....
 }
 ```
+
 > restart the react server to see the changes.
-Now we can use the path without specifying the `localhost:8000` everytime we want to get the data from the database. So, goto the `src/pages/NotesListPage.js` file and type:
+> Now we can use the path without specifying the `localhost:8000` everytime we want to get the data from the database. So, goto the `src/pages/NotesListPage.js` file and type:
 
 ```js
 .....
@@ -1401,15 +1438,15 @@ def updateNote(request, pk): # pk is the primary key of the note
 
     if serializer.is_valid(): # checking if the data is valid
         serializer.save() # saving the data in the database
-    
+
     return Response(serializer.data) # returning the serialized data
 ```
 
 - we added a new function named `updateNote` that takes a `pk` parameter. pk is the primary key of the note or the id of the note.
 
-- `data= request.data` is used to get the data from the request. 
+- `data= request.data` is used to get the data from the request.
 - `note = Note.objects.get(id=pk)` is used to get the note from the database.
-- `serializer = NoteSerializer(instance=note, data=data)` is used to serialize the note. We used `instance=note` because we are updating the note. If we were creating a new note we would use `NoteSerializer(data=data)`. 
+- `serializer = NoteSerializer(instance=note, data=data)` is used to serialize the note. We used `instance=note` because we are updating the note. If we were creating a new note we would use `NoteSerializer(data=data)`.
 - `if serializer.is_valid():` is used to check if the data is valid.
 - `serializer.save()` is used to save the data in the database.
 - `return Response(serializer.data)` is used to return the serialized data.
@@ -1472,7 +1509,7 @@ I just added a `onChange` handler to the `textarea`. This will make the `textare
 
 Now if you goto the `localhost:3000/note/1` you should see the `textarea` editable. But if you type something in the `textarea` and refresh the page you will see that the note is not updated. This is because we didn't send the updated note to the database. But you can now type inside the `textarea` and the note will be updated in the `frontend`.
 
-Now what we want is to send a `PUT` request to the `backend` When we are done typing in the `textarea`. 
+Now what we want is to send a `PUT` request to the `backend` When we are done typing in the `textarea`.
 
 ### Sending the updated note to the backend
 
@@ -1489,7 +1526,7 @@ import { useState, useEffect } from "react";
 const NotePage = () => {
   ..... // the same code from before
 
-  // updating the note in the database 
+  // updating the note in the database
   let updateNote = async () => {
     await fetch(`/api/notes/${id}/update/`, {
       method: "PUT",
@@ -1509,7 +1546,7 @@ const NotePage = () => {
 };
 
 export default NotePage;
-  
+
 ```
 
 - we added a new function named `updateNote` that sends a `PUT` request to the `backend` to update the note.
@@ -1519,7 +1556,7 @@ export default NotePage;
 - we used the `JSON.stringify` function to convert the `note` state to `json` string.
 - we used the `note` state as the `body` of the `PUT` request.
 
-I made a function to do the update but we need to call the function when we are done typing in the `textarea`. Now when do we call this? We can add a new button that will update the note when we click on it, we can also update the note when we click on the back button. 
+I made a function to do the update but we need to call the function when we are done typing in the `textarea`. Now when do we call this? We can add a new button that will update the note when we click on it, we can also update the note when we click on the back button.
 
 I like the second option. You try the first option. I will do the second option. So, goto the `src/pages/NotePage.js` file and type:
 
@@ -1570,7 +1607,7 @@ export default NotePage;
 
 Now this can be messy to unserstand. So, here's what happened here:
 
-- I made a new function named `handleSubmit` that calls the `updateNote` function and redirects to the home page. 
+- I made a new function named `handleSubmit` that calls the `updateNote` function and redirects to the home page.
 
 - I wanted to update the note when we click on the back button. So, I removed the `Link` component and added a `div` with the `onClick` handler so that when we click on the back button the `handleSubmit` function will be called and the note will be updated.
 
@@ -1597,7 +1634,7 @@ That was prety confusing But still have a lot of more fun stuff to do.(by fun I 
 
 ## Deleting a Note
 
-This is the easy one Of the `CRUD` functionality. 
+This is the easy one Of the `CRUD` functionality.
 
 Goto the `backend/notes/views.py` file and type:
 
@@ -1671,7 +1708,6 @@ export default NotePage;
 
 - we used the `DELETE` method to send the `DELETE` request to the `backend`.
 
-
 Now we need to call the `deleteNote` function when we click on the delete button. So, goto the `src/pages/NotePage.js` file and type:
 
 ```js
@@ -1737,6 +1773,7 @@ Now for the hard part. Creating a new note.
 ## Creating a New Note
 
 ### new note Button
+
 It's the same logic as the `deleteNote` function But we will make another `component` only for creating a new note.
 
 So, goto `src/components` folder and make a new file named `addNote.js` and type:
@@ -1752,9 +1789,7 @@ const AddNote = () => {
         <div>
           <div>
             {/* plus icon */}
-            <strong>
-                &#43;
-            </strong>
+            <strong>&#43;</strong>
           </div>
         </div>
       </Link>
@@ -1763,7 +1798,6 @@ const AddNote = () => {
 };
 
 export default AddNote;
-
 ```
 
 This is just a `Link` component that will redirect to the `NotePage` component when we click on the `Link` component. But we need to make a new route for the `NotePage` component. So, goto the `src/NotesListPage.js` file and type:
@@ -1836,8 +1870,8 @@ export default NotePage;
 
 Now if you goto the `localhost:3000/note/new` you should see the `NotePage` component without the trash icon. But if you goto the `localhost:3000/note/1` you should see the `NotePage` component with the trash icon.
 
-
 ### Fixing the routing issue
+
 If you look at the console you should see an error. This is because we are trying to get a note with the `id` of `new` from the database. But we don't have a note with the `id` of `new` in the database. It's because the `useEffect` hook is running when the component is mounted. So, we need to add a condition where if the `id` is not equal to `new` then we will run the `useEffect` hook. So, goto the `src/pages/NotePage.js` file and type:
 
 ```js
@@ -1868,14 +1902,15 @@ const NotePage = () => {
   };
 
 export default NotePage;
-  
+
 ```
 
 As the `useEffect` hook is running the getNote function when the component is mounted. So, we added a condition where if the `id` is equal to `new` then we will return. This will fix the error.
 
-Now time to create a new note. 
+Now time to create a new note.
 
 ### Marging Update and Delete Note
+
 Creating a new Note is as same as `updating` a note. But before doing that want some extra features like when we are edting a existing note If the note is empty then the note will be deleted. we can do that by adding some conditions in the `handleSubmit` function. So, goto the `src/pages/NotePage.js` file and type:
 
 ```js
@@ -1907,7 +1942,7 @@ export default NotePage;
 
 ```
 
-SO, when the `id` is not equal to `new` and the `note.body` is empty then we will delete the note. 
+SO, when the `id` is not equal to `new` and the `note.body` is empty then we will delete the note.
 
 When the `id` is not equal to `new` and the `note.body` is not empty then we will update the note.
 
@@ -1918,7 +1953,7 @@ Now lets make a rest api for creating a new note. So, goto the `backend/notes/vi
 ```python
 .....
 @api_view(['POST']) # adding the POST method
-def createNote(request): 
+def createNote(request):
     data = request.data # getting the data from the request
     note = Note.objects.create( # creating a new note
         body=data['body'] # adding the body field
@@ -1945,13 +1980,12 @@ urlpatterns = [
     path("notes/<str:pk>/", views.getNote, name="getnote"),
     path("notes/<str:pk>/update/", views.updateNote, name="updatenote"),
     path("notes/<str:pk>/delete/", views.deleteNote, name="deletenote"),
-    
+
 ]
 
 ```
 
 > the position of the url path is important. If you put the `createNote` path after the `getNote` path then the `createNote` path will be treated as the `getNote` path and you will be asked to give a `pk` parameter to avoid this issue put the `createNote` path before the `getNote` path.
-
 
 ### New note in frontend
 
@@ -2059,9 +2093,10 @@ export default NotePage;
 # Extra Credit
 
 ## Title Generator
+
 Now that we got all thi sout of the way You should be able to create a new note. Click the plus icon and you should see the `NotePage` component with a done button. Click on the done button and you should see the note created in the `frontend` and the `backend` and you will be redirected to the home page and you should see the note at the top of the `NotesListPage` component.
 
-Now to troubleshoot and fix the issue with the titles of the notes in the `NoteslistPage`. SO, if you make a new note with this data 
+Now to troubleshoot and fix the issue with the titles of the notes in the `NoteslistPage`. SO, if you make a new note with this data
 
 <p>lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quibusdam. wedwedwe iofsjnksdfhbbbnxcnmbnmgdsriopasodoq qwerhsjkhdb sdfskla iksroiufsoierfsoiefhs s edfsiehfgbskdjhfgaknsbfa uagwhreu hawoeea wsd aw o qawiueaoiwhda wehaosdihsdkjfsb dfef oisy hefsef sef soieyhfoseuhfaowehrdakjsdaklmsdf ioer fhosae hseo ifhsoeihf  e oif hseofihsefoiuhse ggsdffsjkhdf qaklwjhd oESIHUfdoqwpqrwsiekfj wo w </p>
 
@@ -2075,7 +2110,7 @@ const ListItem = (note) => {
   const { id, body, updated } = note.note;
 let getUpdateTime = () => {
     let date = new Date(updated);
-    return 
+    return
   let title = body.split("\n")[0]; // getting the first line of the note
 
   if (title.length > 45){
@@ -2134,7 +2169,6 @@ const ListItem = (note) => {
 };
 
 export default ListItem;
-
 ```
 
 Thi swill look bad. We need some stylling in the `uopdate time`. So, goto the `frontend/src/ListItem.js` file and type:
@@ -2155,7 +2189,7 @@ const ListItem = (note) => {
   let getTime = () => {
     let time = new Date(updated); // getting the date from the updated field
     return time.toLocaleDateString() + " " + time.toLocaleTimeString(); // getting the date and time
-  }
+  };
 
   return (
     <div>
@@ -2169,11 +2203,9 @@ const ListItem = (note) => {
       </Link>
     </div>
   );
-
 };
 
 export default ListItem;
-
 ```
 
 - we added a new function named `getTime` that gets the date and time from the `updated` field.
@@ -2184,7 +2216,7 @@ and we are done With this `REACT + DJANGO` project now time to FULLY CONNNECT TH
 
 # Connecting the React App with the Django App
 
-We were using 2 server for the porject. 1. the React server 2. the django server. 
+We were using 2 server for the porject. 1. the React server 2. the django server.
 
 They were in `localhost:3000` and `localhost:8000` respectively and we were using the `proxy` to get the data from the `localhost:8000` server. But we want to do all that in a single server. So, we will use the `django` server to do all that. So, lets get started.
 
@@ -2192,8 +2224,8 @@ If you remember the home page for the `django` server is not set, We will make t
 
 ## Steps
 
-1. Take the `whole Frontend` folder and Cut it and paste it inside the `backend` folder. 
-the foler structure should look like this:
+1. Take the `whole Frontend` folder and Cut it and paste it inside the `backend` folder.
+   the foler structure should look like this:
 
 ```
 project folder
@@ -2218,17 +2250,19 @@ project folder
 
 2. stop all servers.
 3. open the `backend/frontend` folder in terminal and type:
-  
-  ```bash
-  backend/frontend$ npm run build
-  ```
-  this will create a `build` folder in the `backend/frontend` folder. 
-  > build folder is the production build of the react app. it complies all the reatc code to raw javascript , html and css code. you can have a look at the `build` folder if you want to. There will be a lot of files in the `build` folder. But we don't need to worry about that. Just go to the `build/index.html` file and you will see the `html` code for the `react` app.
+
+```bash
+backend/frontend$ npm run build
+```
+
+this will create a `build` folder in the `backend/frontend` folder.
+
+> build folder is the production build of the react app. it complies all the reatc code to raw javascript , html and css code. you can have a look at the `build` folder if you want to. There will be a lot of files in the `build` folder. But we don't need to worry about that. Just go to the `build/index.html` file and you will see the `html` code for the `react` app.
 
 4. now open the `backend/backend/settings.py` and edit the `templates` variable:
-  
+
 ```python
-    
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -2245,9 +2279,10 @@ TEMPLATES = [
 ]
 
 ```
+
 we added the `frontend/build` folder to the `DIRS` variable. This will tell the `django` server to look for the `index.html` file in the `frontend/build` folder.
 
-now `djnago` knows there are some `templates` in the `frontend/build` folder. 
+now `djnago` knows there are some `templates` in the `frontend/build` folder.
 
 There is also some static files too so,
 
@@ -2281,14 +2316,109 @@ But the issue is when we search for a specific url or hard reload the page we ge
 
 ```python
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.views.generic import TemplateView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include('notes.urls')),
-    path('', TemplateView.as_view(template_name='index.html')),
+    path("admin/", admin.site.urls),
+    path("api/", include("notes.urls")),
+    re_path(r"^.*$", TemplateView.as_view(template_name="index.html")),
 ]
-
-urlpatterns += [re_path(r'^.*', TemplateView.as_view(template_name='index.html'))] # adding the url for the react app
 ```
+
+Now this will get rid of the `404` error.
+
+I know this is a lot to take in. But when you are integreting two different frameworks you need to do a lot of stuff. because both of them have different ways of doing things and you have to find a way to make them work together.
+
+7. So, after doing all the most annoyign issue was the DFR`django rest framework` permissions forbidden error. Which is cause when a request is made from the same server but of different origin. Django Rest Framework has a built in feature to prevent this. There are two ways to fix this issue.
+
+1. Send a `csrf` token with the request.
+1. Grant permission to the request manually on the backend.
+
+We will use the second option. So, goto the `backend/notes/views.py` file and type:
+
+```python
+from django.shortcuts import render
+
+# from django.http import JsonResponse
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+from .models import Note
+from .serializers import NoteSerializer
+
+# these are the decorators for the permissions we will use the AllowAny permission
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
+from rest_framework.permissions import AllowAny
+from rest_framework.authentication import BasicAuthentication
+
+# Create your views here.
+
+#removed the getRoutes function because don't need it anymore
+
+@api_view(["GET"])
+def getNotes(request):
+    notes = Note.objects.all().order_by("-updated")
+    serializer = NoteSerializer(notes, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+@authentication_classes([BasicAuthentication]) # adding the authentication_classes decorator
+@permission_classes([AllowAny]) # adding the permission_classes decorator
+def getNote(request, pk):
+    note = Note.objects.get(id=pk)
+    serializer = NoteSerializer(note, many=False)
+    return Response(serializer.data)
+
+
+@api_view(["PUT"])
+@authentication_classes([BasicAuthentication]) # adding the authentication_classes decorator
+@permission_classes([AllowAny]) # adding the permission_classes decorator
+def updateNote(request, pk):
+    data = request.data
+    note = Note.objects.get(id=pk)
+    serializer = NoteSerializer(instance=note, data=data)
+
+    if serializer.is_valid():
+        serializer.save()
+
+    return Response(serializer.data)
+
+
+@api_view(["DELETE"])
+@authentication_classes([BasicAuthentication]) # adding the authentication_classes decorator
+@permission_classes([AllowAny]) # adding the permission_classes decorator
+def deleteNote(request, pk):
+    note = Note.objects.get(id=pk)
+    note.delete()
+    return Response("Note was deleted")
+
+
+@api_view(["POST"])
+@authentication_classes([BasicAuthentication]) # adding the authentication_classes decorator
+@permission_classes([AllowAny]) # adding the permission_classes decorator
+def createNote(request):
+    data = request.data
+    note = Note.objects.create(body=data["body"])
+    serializer = NoteSerializer(note, many=False)
+    return Response(serializer.data)
+
+```
+
+So, these decorators will overwrite the default permissions of the `django rest framework` and grant permission to the request manually on the backend.
+
+If you wanna know about what errors I faced to Just try to do it without the decorators and you will see the errors.
+
+And thats it. This is how you connect the `react` app with the `django` app.
+
+AND THIS WAS THE LAST PART OF THE TUTORIAL. I HOPE YOU ENJOYED IT. IF YOU HAVE ANY QUESTIONS FEEL FREE TO ASK ME. I WILL TRY TO ANSWER THEM AS SOON AS POSSIBLE. THANK YOU FOR READING THIS TUTORIAL.
+
+# THE END
+
+![THE END](./Screenshot%20from%202023-12-08%2022-04-20.png)
